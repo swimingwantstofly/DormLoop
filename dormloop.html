@@ -1,0 +1,625 @@
+<title>DormLoop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Rubik:wght@600;700&display=swap">
+<style>
+/* Layout: a phone-width app column, centered; on wide screens an intro panel sits beside it. Single light look by design. */
+:root{
+  --teal:#0B9B8A; --teal-deep:#087A6D; --pink:#F596A1; --pink-deep:#D9667A; --pink-soft:#FADEEB;
+  --blue:#C4E1F6; --yellow:#F9C975; --mint:#D9F1EE; --cream:#FDEBC8;
+  --ink:#1E2A3A; --ink-2:#3D4652; --muted:#5B6470; --line:#E5EAEA;
+  --bg:#F6F8F8; --page:#E9EEEE; --card:#FFFFFF; --soft:#EEF2F2; --chip:#DDE4E4; --on-teal:#D7F0EC;
+  --night:#14171B; --night-2:#23272D; --night-line:#3B4048;
+  --font:'Noto Sans TC',system-ui,-apple-system,'PingFang TC','Microsoft JhengHei',sans-serif;
+  --logo:'Rubik','Noto Sans TC',system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased}
+button,input,select{font-family:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+.shell{height:100%;display:flex;justify-content:center;gap:56px;align-items:stretch}
+.intro{display:none}
+.app{width:100%;max-width:440px;height:100%;background:var(--bg);display:flex;flex-direction:column;position:relative;overflow:hidden}
+@media (min-width:900px){
+  .shell{padding-block:24px;align-items:center}
+  .app{height:min(880px,100%);border-radius:32px;box-shadow:0 24px 60px rgba(30,42,58,.18);border:6px solid var(--ink)}
+  .intro{display:flex;flex-direction:column;gap:20px;max-width:360px}
+}
+.intro h1{font-family:var(--logo);font-size:56px;margin:0;line-height:1}
+.intro h1 span,.logo span{color:var(--teal)}
+.intro p{margin:0;font-size:18px;line-height:1.7;color:var(--ink-2)}
+.intro ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.intro li{display:flex;gap:12px;align-items:center;font-size:16px;font-weight:700}
+.intro li i{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;font-style:normal;flex-shrink:0}
+.intro small{font-size:13px;color:var(--muted)}
+
+/* chrome */
+.bar{height:56px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 12px 0 16px;background:var(--card);border-bottom:1px solid var(--line)}
+.logo{display:flex;align-items:center;gap:8px;font-family:var(--logo);font-size:22px;font-weight:700}
+.logo b{width:30px;height:30px;border-radius:9px;background:var(--teal);color:#fff;display:grid;place-items:center}
+.bar h2{margin:0;font-size:16px;font-weight:700}
+.icon-btn{width:44px;height:44px;border:0;background:transparent;display:grid;place-items:center;border-radius:12px}
+.scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;position:relative}
+.nav{height:72px;flex-shrink:0;background:var(--card);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);align-items:center;padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav button{height:60px;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:var(--muted)}
+.nav button[aria-current="page"]{color:var(--teal-deep);font-weight:700}
+.nav .sell{margin-top:-24px;color:var(--teal-deep);font-weight:700;height:auto}
+.nav .sell span{width:56px;height:56px;border-radius:28px;background:var(--teal);color:#fff;display:grid;place-items:center;border:4px solid var(--card);box-shadow:0 4px 12px rgba(11,155,138,.35)}
+
+/* home */
+.locbox{background:var(--card);padding:4px 16px 12px;display:flex;flex-direction:column;gap:10px;position:relative}
+.locrow{display:flex;align-items:center;justify-content:space-between}
+.loc{min-height:44px;border:0;background:transparent;padding:0;display:flex;align-items:center;gap:4px;font-size:15px;font-weight:700}
+.loc svg.chev{transition:transform .2s}
+.loc[aria-expanded="true"] svg.chev{transform:rotate(180deg)}
+.verified{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:var(--teal-deep);background:var(--mint);padding:4px 10px;border-radius:999px}
+.drop{position:absolute;top:48px;left:16px;width:230px;z-index:5;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 28px rgba(30,42,58,.18);padding:6px;display:flex;flex-direction:column}
+.drop button{min-height:44px;border:0;border-radius:10px;background:transparent;text-align:left;padding:0 12px;font-size:15px;display:flex;align-items:center;justify-content:space-between}
+.drop button[aria-selected="true"]{background:var(--mint);font-weight:700}
+.drop small{font-size:12px;color:var(--muted)}
+.search{height:42px;display:flex;align-items:center;gap:8px;padding:0 14px;border-radius:12px;background:var(--soft);color:var(--muted)}
+.search input{flex:1;min-width:0;border:0;background:transparent;font-size:15px;outline:none;color:var(--ink)}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);background:var(--card);border-bottom:1px solid var(--line)}
+.tabs button{height:44px;border:0;background:transparent;font-size:15px;color:var(--muted)}
+.tabs button[aria-pressed="true"]{color:var(--ink);font-weight:700;box-shadow:inset 0 -3px 0 var(--teal)}
+.hero{margin:16px 16px 0;border-radius:18px;background:var(--teal-deep);color:#fff;padding:20px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:6px;min-height:168px}
+.hero .tag{align-self:flex-start;font-size:12px;font-weight:700;background:var(--yellow);padding:3px 10px;border-radius:999px}
+.hero h3{margin:2px 0 0;font-size:22px;line-height:1.3;font-weight:900;text-wrap:balance;max-width:220px}
+.hero .tag{color:var(--ink)}
+.hero p{margin:0;font-size:13px;color:var(--on-teal)}
+.hero button{margin-top:6px;align-self:flex-start;height:40px;padding:0 16px;border-radius:999px;border:0;background:#fff;color:var(--teal-deep);font-size:14px;font-weight:700}
+.hero svg.art{position:absolute;right:6px;bottom:0}
+.promos{margin:16px 16px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.promos button{height:108px;border:1px solid var(--line);background:var(--card);padding:12px;border-radius:14px;text-align:left;display:flex;flex-direction:column;justify-content:space-between;font-size:15px;font-weight:900;line-height:1.3;color:var(--ink)}
+.promos i{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:var(--ink)}
+.chips{margin-top:18px;padding:0 16px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex-shrink:0;min-height:40px;padding:0 14px;border-radius:999px;border:1.5px solid var(--chip);background:var(--card);font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
+.chips button[aria-pressed="true"],.slots button[aria-pressed="true"],.condpick button[aria-pressed="true"]{background:var(--teal-deep);border-color:var(--teal-deep);color:#fff}
+.sechead{margin:20px 16px 10px;display:flex;align-items:baseline;justify-content:space-between}
+.sechead h3{margin:0;font-size:18px;font-weight:900}
+.sechead span{font-size:13px;color:var(--muted)}
+.grid{margin:0 16px 24px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.card{position:relative;border-radius:14px;background:var(--card);overflow:hidden}
+.card .open{width:100%;border:0;padding:0;background:transparent;text-align:left;display:flex;flex-direction:column}
+.thumb{width:100%;display:grid;place-items:center;color:var(--muted);position:relative}
+.cond{position:absolute;top:8px;left:8px;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px}
+.c-new{background:var(--mint);color:var(--teal-deep)}
+.c-used{background:var(--blue);color:#1E4A6E}
+.c-worn{background:var(--pink-soft);color:#A3324A}
+.card .meta{padding:10px 12px 12px;display:flex;flex-direction:column;gap:3px}
+.name{font-size:14px;font-weight:700;line-height:1.35}
+.sub{font-size:12px;color:var(--muted)}
+.price{font-size:16px;font-weight:900;color:var(--teal-deep);font-variant-numeric:tabular-nums}
+.heart{position:absolute;top:4px;right:4px;width:40px;height:40px;border:0;border-radius:20px;background:rgba(255,255,255,.92);display:grid;place-items:center;color:var(--ink)}
+.heart[aria-pressed="true"]{color:var(--pink-deep)}
+.heart[aria-pressed="true"] path{fill:var(--pink)}
+.empty{margin:8px 16px 0;padding:28px 16px;text-align:center;background:var(--card);border-radius:14px;font-size:14px;line-height:1.7;color:var(--muted)}
+
+/* lists */
+.pad{padding:16px;display:flex;flex-direction:column;gap:12px}
+.row{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:14px;padding:10px}
+.row .open{flex:1;min-width:0;border:0;background:transparent;padding:0;display:flex;align-items:center;gap:12px;text-align:left}
+.sq{flex-shrink:0;border-radius:10px;display:grid;place-items:center;color:var(--muted)}
+.col{display:flex;flex-direction:column;gap:3px;min-width:0}
+.pill{align-self:flex-start;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px}
+.thread{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--line)}
+.avatar{width:44px;height:44px;flex-shrink:0;border-radius:22px;display:grid;place-items:center;font-weight:700;color:var(--ink)}
+.thread .top{display:flex;justify-content:space-between;font-size:14px;font-weight:700}
+.thread .top small{font-weight:400;color:var(--muted);font-size:12px}
+.profile{display:flex;align-items:center;gap:12px}
+.profile .avatar{width:52px;height:52px;border-radius:26px;background:var(--teal);color:#fff;font-size:20px}
+.countdown{background:var(--teal-deep);color:#fff;border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:6px}
+.countdown strong{font-family:var(--logo);font-size:30px}
+.countdown span{font-size:13px;color:var(--on-teal)}
+.btn{min-height:48px;border:0;border-radius:14px;font-size:15px;font-weight:700;padding:0 16px}
+.btn-main{background:var(--teal-deep);color:#fff}
+.btn-yellow{background:var(--yellow);color:var(--ink)}
+.btn-blue{background:var(--blue);color:var(--ink)}
+.btn-line{background:var(--card);border:1.5px solid var(--ink);color:var(--ink)}
+.linkrow{min-height:52px;border:0;border-radius:14px;background:var(--card);padding:0 16px;display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:700}
+.linkrow small{font-weight:400;color:var(--muted);font-size:13px}
+h4{margin:4px 0 0;font-size:16px;font-weight:900}
+
+/* detail */
+.detail-img{height:260px;display:grid;place-items:center;color:var(--muted);position:relative}
+.detail-img small{position:absolute;bottom:12px;right:12px;font-size:12px;color:#fff;background:rgba(30,42,58,.7);padding:3px 10px;border-radius:999px}
+.detail h1{margin:0;font-size:20px;font-weight:900}
+.detail .price{font-size:24px}
+.detail p{margin:0;font-size:14px;line-height:1.7;color:var(--ink-2)}
+.box{background:var(--card);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.box b{font-size:14px}
+.box small{font-size:12px;color:var(--muted)}
+.slots{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.slots button{min-height:44px;border-radius:12px;border:1.5px solid var(--chip);background:var(--card);font-size:14px;font-weight:700}
+.cta{flex-shrink:0;padding:12px 16px calc(16px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:1px solid var(--line);display:flex;gap:10px}
+.cta .heart{position:static;width:52px;height:52px;border-radius:14px;border:1.5px solid var(--chip);background:var(--card)}
+.cta .btn{flex:1;height:52px;font-size:16px}
+
+/* orders */
+.order{background:var(--card);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.code{display:flex;gap:8px}
+.code span{width:48px;height:56px;border-radius:10px;background:var(--soft);font-family:var(--logo);font-size:28px;font-weight:700;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.order.done .code span{color:var(--muted)}
+.steps{display:flex;justify-content:space-between}
+.steps span{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:#8A919B}
+.steps span i{width:16px;height:16px;border-radius:8px;background:var(--line)}
+.steps span.on{color:var(--teal-deep)}
+.steps span.on i{background:var(--teal)}
+
+/* camera (simulated) */
+.night{background:var(--night);color:#fff}
+.night .bar{background:var(--night);border-color:var(--night-2)}
+.night .icon-btn{color:#fff}
+.shotsteps{margin:0;padding:4px 16px 12px;list-style:none;display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.shotsteps li{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:#B4BAC3}
+.shotsteps button{width:56px;height:56px;border-radius:12px;border:1.5px solid var(--night-line);background:var(--night-2);color:#8A919B;display:grid;place-items:center;position:relative;padding:0}
+.shotsteps button.cur{border:2px solid var(--teal);background:rgba(11,155,138,.25);color:#fff}
+.shotsteps button.ok{border-color:var(--teal);background:#0E3A35;color:#fff}
+.shotsteps button.ok::after{content:"✓";position:absolute;right:-5px;top:-5px;width:20px;height:20px;border-radius:10px;background:var(--teal);color:#fff;font-size:12px;font-weight:900;display:grid;place-items:center;border:2px solid var(--night)}
+.shotsteps li.cur{color:#fff;font-weight:700}
+.finder{margin:0 16px;flex:1;min-height:340px;border-radius:20px;background:#2A2E34;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center}
+.finder .label{margin-top:16px;display:flex;align-items:center;gap:6px;background:rgba(20,23,27,.75);padding:8px 14px;border-radius:999px;font-size:14px;font-weight:700}
+.finder .label em{font-style:normal;font-size:12px;color:var(--ink);background:var(--yellow);padding:2px 8px;border-radius:999px}
+.finder svg.ghost{margin-top:18px;flex:1;max-height:260px;width:70%}
+.finder p{margin:12px 24px 54px;font-size:14px;line-height:1.6;text-align:center;color:#E3E6EA}
+.corner{position:absolute;width:28px;height:28px;border-color:#fff;border-style:solid;border-width:0}
+.c1{top:14px;left:14px;border-top-width:3px;border-left-width:3px;border-top-left-radius:8px}
+.c2{top:14px;right:14px;border-top-width:3px;border-right-width:3px;border-top-right-radius:8px}
+.c3{bottom:14px;left:14px;border-bottom-width:3px;border-left-width:3px;border-bottom-left-radius:8px}
+.c4{bottom:14px;right:14px;border-bottom-width:3px;border-right-width:3px;border-bottom-right-radius:8px}
+.finder .dist{position:absolute;bottom:20px;font-size:12px;background:rgba(20,23,27,.75);padding:4px 10px;border-radius:999px}
+.flash{animation:flash .25s ease-out}
+@keyframes flash{from{background:#fff}to{background:#2A2E34}}
+@media (prefers-reduced-motion:reduce){.flash{animation:none}.loc svg.chev{transition:none}}
+.shutterbar{height:120px;flex-shrink:0;display:grid;grid-template-columns:repeat(3,1fr);align-items:center;padding:0 24px env(safe-area-inset-bottom,0px)}
+.shutter{justify-self:center;width:76px;height:76px;border-radius:38px;border:4px solid #fff;background:transparent;padding:4px}
+.shutter span{display:block;width:100%;height:100%;border-radius:50%;background:#fff}
+.skip{justify-self:end;min-height:44px;border:0;background:transparent;color:#D5DBE3;font-size:14px}
+.donebox{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:0 28px;text-align:center}
+.donebox .ok{width:72px;height:72px;border-radius:36px;background:var(--teal);display:grid;place-items:center}
+.donebox h3{margin:0;font-size:22px}
+.donebox p{margin:0;font-size:14px;line-height:1.7;color:#D5DBE3}
+
+/* review form */
+.field{display:flex;flex-direction:column;gap:6px}
+.field label,.field .lbl{font-size:13px;color:var(--muted);font-weight:500}
+.field input,.field select{height:46px;border-radius:12px;border:1.5px solid var(--chip);background:var(--card);padding:0 12px;font-size:16px}
+.field small{font-size:12px;color:var(--muted)}
+.aibanner{display:flex;gap:8px;align-items:center;background:#FEF3D9;border-radius:12px;padding:10px 12px;font-size:13px;font-weight:700}
+.photos{display:flex;gap:8px}
+.photos span{width:64px;height:64px;border-radius:12px;display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--ink)}
+.condpick{display:flex;gap:8px;flex-wrap:wrap}
+.condpick button{min-height:40px;padding:0 14px;border-radius:999px;border:1.5px solid var(--chip);background:var(--card);font-size:14px;font-weight:700}
+
+.dealbtn{margin-top:6px;min-height:48px;border:0;border-radius:14px;background:var(--yellow);color:var(--ink);font-size:15px;font-weight:700;padding:0 16px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dealbtn svg{transition:transform .2s}
+.dealbtn[aria-expanded="true"] svg{transform:rotate(180deg)}
+.dealmenu{background:var(--card);color:var(--ink);border-radius:14px;padding:6px;display:flex;flex-direction:column;box-shadow:0 8px 20px rgba(30,42,58,.18)}
+.dealmenu button{min-height:44px;border:0;border-radius:10px;background:transparent;text-align:left;padding:0 12px;font-size:15px;display:flex;align-items:center;justify-content:space-between}
+.dealmenu button[aria-checked="true"]{background:var(--mint);font-weight:700;color:var(--teal-deep)}
+.dealmenu .cancel{color:#A3324A;border-top:1px solid var(--line);border-radius:0 0 10px 10px}
+.storage{background:var(--card);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;border:1.5px dashed var(--chip)}
+.storage .spot{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--soft);border-radius:12px;padding:10px 12px}
+.storage .spot button{min-height:40px;border:0;border-radius:10px;background:var(--teal-deep);color:#fff;font-weight:700;font-size:14px;padding:0 14px;flex-shrink:0}
+.settings{background:var(--card);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.settings .lbl{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
+.seg{display:flex;background:var(--soft);border-radius:12px;padding:4px;gap:4px}
+.seg button{flex:1;min-height:40px;border:0;border-radius:9px;background:transparent;font-weight:700;font-size:14px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--teal-deep);box-shadow:0 1px 3px rgba(30,42,58,.14)}
+.toast{position:absolute;left:50%;bottom:92px;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:14px;font-weight:700;padding:10px 18px;border-radius:999px;white-space:nowrap;box-shadow:0 6px 18px rgba(30,42,58,.3);z-index:20}
+</style>
+
+<div class="shell">
+  <aside class="intro" id="intro"></aside>
+  <div class="app" id="app"></div>
+</div>
+
+<script>
+(function(){
+const I = {
+  desk:'M3 9h18M5 9v11M19 9v11M5 14h7v6', chair:'M7 3v9h10V3M6 12h12M7 12v9M17 12v9',
+  cabinet:'M5 3h14v18H5zM5 12h14M10 7.5h4M10 16.5h4', bed:'M3 19V7M3 13h18v6M7 13v-2a2 2 0 0 1 2-2h3v4',
+  lamp:'M9 3h6l3 7H6zM12 10v9M8 21h8', fan:'M12 4a6 6 0 1 1 0 12a6 6 0 1 1 0-12M12 16v4M8 20h8M12 10l3-3',
+  books:'M4 5h5v15H4zM9 5h5v15H9zM15 6l4-1 3 14-4 1z', basket:'M4 9h16l-2 11H6zM9 9l3-5 3 5',
+  all:'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
+  home:'M3 11l9-7 9 7v9h-6v-6H9v6H3z', heart:'M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z',
+  chat:'M4 5h16v11H9l-5 4z', user:'M12 4a4 4 0 1 1 0 8a4 4 0 1 1 0-8M4 21c1-4 4-6 8-6s7 2 8 6',
+  cam:'M4 8h3l2-3h6l2 3h3v11H4zM12 9.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 1 1 0-7',
+  back:'M15 5l-7 7 7 7', close:'M6 6l12 12M18 6L6 18', pin:'M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11zM12 7.5a2.5 2.5 0 1 1 0 5a2.5 2.5 0 1 1 0-5',
+  chev:'M6 9l6 6 6-6', search:'M11 4.5a6.5 6.5 0 1 1 0 13a6.5 6.5 0 1 1 0-13M20 20l-4-4', shield:'M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6zM9 12l2 2 4-4',
+  loop:'M17 3l3 3-3 3M4 11V9a3 3 0 0 1 3-3h13M7 21l-3-3 3-3M20 13v2a3 3 0 0 1-3 3H4',
+  spark:'M12 3v3M12 18v3M3 12h3M18 12h3M6 6l2 2M16 16l2 2M6 18l2-2M16 8l2-2', building:'M4 21V9l8-5 8 5v12M9 21v-5h6v5', box:'M4 7h16v13H4zM9 7V4h6v3M4 12h16',
+  check:'M5 12l5 5 9-10', globe:'M12 3a9 9 0 1 1 0 18a9 9 0 1 1 0-18M3 12h18M12 3c2.5 2.5 3.5 5.5 3.5 9s-1 6.5-3.5 9M12 3c-2.5 2.5-3.5 5.5-3.5 9s1 6.5 3.5 9'
+};
+const svg=(d,s=24,w=1.9,extra='')=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra}><path d="${d}"/></svg>`;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------- text in both languages ---------- */
+const L={
+zh:{
+  html:'zh-Hant',
+  nav_home:'首頁',nav_saved:'收藏',nav_sell:'拍照賣',nav_msg:'訊息',nav_me:'我的',main_menu:'主選單',
+  title_saved:'我的收藏',title_msg:'訊息',title_me:'我的',
+  verified:'政大校內認證',choose_dorm:'選擇宿舍',count:n=>`${n} 件`,
+  search_sr:'搜尋商品',search_ph:'搜尋書桌、檯燈、收納櫃…',
+  tabs:['最新上架','熱門好物','退宿特賣'],
+  hero_aria:'活動',hero_tag:'退宿季開跑',hero_h:'好家具，不必丟進回收場',hero_p:'同棟上架，下樓就能取貨',hero_btn:'我也要賣 ›',
+  promo:['AI 快速<br>上架','同棟面交<br>下樓就成交','學生會<br>退宿清倉'],
+  cats_aria:'分類',cats:{all:'全部',desk:'書桌',chair:'椅子',cabinet:'收納櫃',bed:'寢具',lamp:'燈具',fan:'小家電',books:'書籍',basket:'雜貨'},
+  list_title:b=>`${b}的好物`,total:n=>`共 ${n} 件`,empty_home:'這裡還沒有符合的商品，換個宿舍或分類看看。',
+  same_floor:' · 同樓層',save_add:'加入收藏',save_rm:'取消收藏',t_saved:'已加入收藏',t_unsaved:'已取消收藏',
+  empty_saved:'還沒有收藏。<br>在首頁點商品右上角的愛心就能收藏。',
+  me_name:'小安',me_initial:'安',me_sub:'男七舍 3F · 政大認證',
+  cd_label:'距離退宿還有',cd_time:'2 天 14 小時',cd_bundled:'打包 8 折進行中，已推播給同棟同學',cd_unsold:n=>`還有 ${n} 件未售出`,
+  bundle_on:'打包 8 折進行中 ✓（點擊取消）',bundle_off:'一鍵打包 8 折出清',
+  my_listings:'我的上架',my_orders:'我的訂單',orders_n:n=>`${n} 筆 ›`,
+  deal_none:'選擇退宿出清方式',deal_opts:[['0.8','全部 8 折'],['0.6','全部 6 折'],['0.4','全部 4 折'],['0','免費送出'],['storage','尋找寄放地點']],deal_cancel:'取消優惠',
+  deal_on:{'0.8':'全部 8 折中','0.6':'全部 6 折中','0.4':'全部 4 折中','0':'免費送出中','storage':'尋找寄放地點'},cd_deal:l=>`${l}，已推播給同棟同學`,
+  t_deal:l=>`已推播「${l}」給男七舍的同學`,free:'免費',
+  storage_title:'寄放地點（第二階段功能・示範）',storage_note:'來不及賣完？先寄放，買家之後再去取。',
+  storage_spots:[['男七舍服務台','每人最多 2 件・保管 7 天'],['學生會辦公室','大型家具・保管 14 天']],storage_btn:'預約',t_storage:'已送出寄放預約（示範）',
+  settings:'設定',lang_label:'語言 Language',t_lang:'已切換為中文',
+  st:{req2:'2 人預約中',none:'尚無人詢問',fresh:'剛上架'},
+  detail_title:'商品詳情',photos:'1 / 4 張照片',pickup_at:b=>`取貨地點：${b}`,privacy:'為保護隱私，雙方確認預約後才會顯示房號',
+  pick_time:'選擇面交時間',seller:s=>`賣家 ${s} · 已通過政大認證`,booked_btn:'已預約，查看訂單',book_btn:'預約面交',
+  slots:['今天 19:00','今天 21:00','週二 12:30','週二 18:00'],
+  steps:['已預約','賣家確認','已取貨'],code_label:'取貨碼（面交時出示給賣家）',code_aria:'取貨碼',
+  adv0:'示範：賣家確認預約',adv1:'示範：賣家核對取貨碼，完成交貨',
+  t_booked:'已送出預約，等待賣家確認',t_conf:'賣家已確認，記得準時取貨',t_done:'取貨碼正確，交易完成！',
+  t_bundle_on:'已推播給男七舍的同學',t_bundle_off:'已取消打包優惠',t_same:'只顯示男七舍 3F 的商品',t_sale:'退宿特賣：全部宿舍',
+  back:'返回',sell_title:'拍照上架 · 示範',shots_aria:'拍攝步驟',retake:'（已拍，點擊重拍）',
+  done_h:n=>`拍好 ${n} 張照片了！`,done_p:'AI 已辨識品項、尺寸與使用狀況，<br>下一步幫你確認商品資訊。',
+  to_review:'下一步：確認資訊',reshoot:'重新拍攝',shutter:'拍照',skip:'略過 ›',
+  review_title:'確認商品資訊',ai_banner:'AI 已幫你填好，請確認後再上架',
+  f_name:'品名',f_cat:'分類',f_cond:'使用狀況',f_price:'售價（NT$）',f_price_note:'AI 建議 NT$ 300・僅供參考，可以自己調整',
+  f_place:'面交地點',place_note:'只會顯示棟別和樓層，房號在雙方確認後才公開',publish:'上架',
+  t_published:'已上架！同棟同學現在看得到了',draft_name:'木製雙層書架',untitled:'未命名商品',new_desc:'剛上架的商品，照片由引導拍照產生。',
+  cond:{new:'近全新',used:'輕微使用',worn:'有小瑕疵'},
+  B:['全部宿舍','男七舍 3F','男七舍 5F','女二舍 2F','自強十舍 4F'],
+  threads:[['哲','阿哲','書桌檯燈','我 7 點在 3 樓交誼廳等你','10:24'],['佳','佳穎','微積分課本','請問還在嗎？','昨天'],['宇','宇恩','單人床墊','可以幫忙抬到樓梯口喔','週五']],
+  intro_p:'退宿不丟家具，留給同棟的下一位。拍照就能上架，下樓就能取貨。',
+  intro_li:['拍照上架，AI 幫你填好資訊','依宿舍與樓層找好物','4 位數取貨碼確認交貨'],
+  intro_small:'示範原型：商品、價格與人名皆為範例資料。',
+  shots:[
+    ['正面','拍家具正面','站在正前方，讓整件家具完整入框，門和抽屜先關上。','距離約 1.5 公尺'],
+    ['背面','轉過來拍背面','拍出背板和固定螺絲，買家最在意有沒有受潮或破損。','距離約 1.5 公尺'],
+    ['側面','拍側面看深度','從側邊拍，讓買家判斷放不放得進自己的房間。','距離約 1.5 公尺'],
+    ['標籤','拍品牌標籤或型號','對準貼紙或型號牌拍特寫，AI 會自動帶入品牌與尺寸。','距離約 15 公分'],
+    ['瑕疵','有刮痕或破損嗎？（選填）','主動拍出瑕疵特寫，可以減少面交時的糾紛。沒有就略過。','距離約 20 公分']
+  ]
+},
+en:{
+  html:'en',
+  nav_home:'Home',nav_saved:'Saved',nav_sell:'Sell',nav_msg:'Messages',nav_me:'Me',main_menu:'Main menu',
+  title_saved:'Saved items',title_msg:'Messages',title_me:'My page',
+  verified:'NCCU verified',choose_dorm:'Choose a dorm',count:n=>`${n} items`,
+  search_sr:'Search items',search_ph:'Search desks, lamps, shelves…',
+  tabs:['New','Popular','Move-out sale'],
+  hero_aria:'Promotion',hero_tag:'Move-out season',hero_h:'Good furniture shouldn’t end up in the trash',hero_p:'List it in your building, pick it up downstairs',hero_btn:'Sell yours ›',
+  promo:['AI quick<br>listing','Same-floor<br>pickup','Council<br>clearance'],
+  cats_aria:'Categories',cats:{all:'All',desk:'Desks',chair:'Chairs',cabinet:'Storage',bed:'Bedding',lamp:'Lamps',fan:'Appliances',books:'Books',basket:'Household'},
+  list_title:b=>`Finds in ${b}`,total:n=>`${n} items`,empty_home:'Nothing here yet. Try another dorm or category.',
+  same_floor:' · your floor',save_add:'Save',save_rm:'Unsave',t_saved:'Saved',t_unsaved:'Removed from saved',
+  empty_saved:'Nothing saved yet.<br>Tap the heart on any item to save it.',
+  me_name:'An',me_initial:'A',me_sub:'Boys’ Dorm 7, 3F · NCCU verified',
+  cd_label:'Move-out in',cd_time:'2 days 14 hrs',cd_bundled:'Bundle deal is live and sent to your building',cd_unsold:n=>`${n} items still unsold`,
+  bundle_on:'Bundle 20% off is on ✓ (tap to cancel)',bundle_off:'Bundle everything at 20% off',
+  my_listings:'My listings',my_orders:'My orders',orders_n:n=>`${n} ›`,
+  deal_none:'Choose a move-out deal',deal_opts:[['0.8','20% off everything'],['0.6','40% off everything'],['0.4','60% off everything'],['0','Give it all away free'],['storage','Find a storage spot']],deal_cancel:'Cancel deal',
+  deal_on:{'0.8':'20% off everything','0.6':'40% off everything','0.4':'60% off everything','0':'Giving it all away free','storage':'Find a storage spot'},cd_deal:l=>`${l}, sent to your building`,
+  t_deal:l=>`“${l}” sent to Boys’ Dorm 7`,free:'Free',
+  storage_title:'Storage spots (Phase 2 · demo)',storage_note:'Can’t sell in time? Store it and buyers pick it up later.',
+  storage_spots:[['Boys’ Dorm 7 front desk','Up to 2 items · kept 7 days'],['Student council office','Large items · kept 14 days']],storage_btn:'Book',t_storage:'Storage request sent (demo)',
+  settings:'Settings',lang_label:'語言 Language',t_lang:'Switched to English',
+  st:{req2:'2 requests',none:'No requests yet',fresh:'Just listed'},
+  detail_title:'Item details',photos:'1 / 4 photos',pickup_at:b=>`Pickup: ${b}`,privacy:'The room number is shown only after both sides confirm',
+  pick_time:'Pick a pickup time',seller:s=>`Seller ${s} · NCCU verified`,booked_btn:'Requested, view order',book_btn:'Request pickup',
+  slots:['Today 19:00','Today 21:00','Tue 12:30','Tue 18:00'],
+  steps:['Requested','Confirmed','Picked up'],code_label:'Pickup code (show it to the seller)',code_aria:'Pickup code',
+  adv0:'Demo: seller confirms',adv1:'Demo: seller checks the code',
+  t_booked:'Request sent. Waiting for the seller.',t_conf:'Seller confirmed. See you at pickup.',t_done:'Code matched. Handoff complete!',
+  t_bundle_on:'Sent to everyone in Boys’ Dorm 7',t_bundle_off:'Bundle deal cancelled',t_same:'Showing Boys’ Dorm 7, 3F only',t_sale:'Move-out sale: all dorms',
+  back:'Back',sell_title:'Photo listing · demo',shots_aria:'Photo steps',retake:' (taken, tap to retake)',
+  done_h:n=>`${n} photos taken!`,done_p:'AI has recognised the item, size and condition.<br>Next, check the details.',
+  to_review:'Next: check details',reshoot:'Retake all',shutter:'Take photo',skip:'Skip ›',
+  review_title:'Check your listing',ai_banner:'AI filled this in. Check it before you publish.',
+  f_name:'Item name',f_cat:'Category',f_cond:'Condition',f_price:'Price (NT$)',f_price_note:'AI suggests NT$ 300. For reference only, change it if you like.',
+  f_place:'Pickup spot',place_note:'Only the building and floor are shown. The room number appears after both sides confirm.',publish:'Publish',
+  t_published:'Published! Your building can see it now.',draft_name:'Wooden 2-tier shelf',untitled:'Untitled item',new_desc:'Just listed. Photos taken with guided capture.',
+  cond:{new:'Like new',used:'Lightly used',worn:'Minor flaws'},
+  B:['All dorms','Boys’ Dorm 7, 3F','Boys’ Dorm 7, 5F','Girls’ Dorm 2, 2F','Ziqiang 10, 4F'],
+  threads:[['Z','Zhe','Desk lamp','I’ll be in the 3F lounge at 7','10:24'],['J','Jiaying','Calculus textbook','Is this still available?','Yesterday'],['Y','Yuen','Single mattress','I can help carry it to the stairs','Fri']],
+  intro_p:'Don’t throw out your furniture when you move out. Pass it on to the next student in your building.',
+  intro_li:['Snap photos, AI fills in the listing','Browse by dorm and floor','4-digit code confirms each handoff'],
+  intro_small:'Demo prototype: items, prices and names are examples.',
+  shots:[
+    ['Front','Shoot the front','Stand straight in front so the whole piece fits. Close doors and drawers first.','About 1.5 m away'],
+    ['Back','Turn it and shoot the back','Show the back panel and screws. Buyers want to know about damp or damage.','About 1.5 m away'],
+    ['Side','Shoot the side for depth','A side view helps buyers check if it fits their room.','About 1.5 m away'],
+    ['Label','Shoot the brand label','Get close to the sticker or model plate. AI fills in the brand and size.','About 15 cm away'],
+    ['Flaws','Any scratches or damage? (optional)','A close-up of flaws prevents arguments at pickup. Skip if there are none.','About 20 cm away']
+  ]
+}};
+
+const CONDCLS={new:'c-new',used:'c-used',worn:'c-worn'};
+const TINT=['#FCEEF3','#EAF3FB','#FEF5E1','#E6F4F2'];
+const items=[
+  {id:1,name:{zh:'書桌檯燈（暖白光）',en:'Desk lamp (warm white)'},price:150,cond:'new',b:1,cat:'lamp',hot:1,sale:0,seller:{zh:'阿哲',en:'Zhe'},desc:{zh:'用了一學期，三段亮度可調，燈泡正常。附原廠變壓器。',en:'Used for one semester. Three brightness levels, bulb works. Comes with the original adapter.'}},
+  {id:2,name:{zh:'木製三層收納櫃',en:'Wooden 3-tier cabinet'},price:400,cond:'used',b:1,cat:'cabinet',hot:1,sale:1,seller:{zh:'小安',en:'An'},desc:{zh:'寬 60 公分，背板完好沒有受潮。側邊有一點刮痕，瑕疵照有拍。',en:'60 cm wide, back panel intact with no damp. Small scratch on the side, shown in the flaw photo.'}},
+  {id:3,name:{zh:'可調高度辦公椅',en:'Adjustable office chair'},price:900,cond:'used',b:1,cat:'chair',hot:0,sale:0,seller:{zh:'小安',en:'An'},desc:{zh:'氣壓棒正常，椅背可後仰。坐墊稍有使用痕跡。',en:'Gas lift works and the back reclines. Some wear on the seat.'}},
+  {id:4,name:{zh:'單人床墊 3×6.2 尺',en:'Single mattress 3×6.2 ft'},price:600,cond:'worn',b:2,cat:'bed',hot:0,sale:1,seller:{zh:'宇恩',en:'Yuen'},desc:{zh:'獨立筒，一角有小污漬（已拍瑕疵照）。可以幫忙抬到樓梯口。',en:'Pocket springs. Small stain on one corner (see flaw photo). I can help carry it to the stairs.'}},
+  {id:5,name:{zh:'小型電風扇',en:'Small electric fan'},price:250,cond:'new',b:1,cat:'fan',hot:1,sale:0,seller:{zh:'阿哲',en:'Zhe'},desc:{zh:'12 吋桌扇，三段風速，用不到一個月。',en:'12-inch desk fan, three speeds, used for less than a month.'}},
+  {id:6,name:{zh:'微積分課本（第 9 版）',en:'Calculus textbook (9th ed.)'},price:200,cond:'used',b:3,cat:'books',hot:1,sale:1,seller:{zh:'佳穎',en:'Jiaying'},desc:{zh:'少量螢光筆畫記，沒有缺頁。',en:'A little highlighting, no missing pages.'}},
+  {id:7,name:{zh:'折疊書桌',en:'Folding desk'},price:500,cond:'used',b:3,cat:'desk',hot:0,sale:0,seller:{zh:'佳穎',en:'Jiaying'},desc:{zh:'寬 80 公分，收起來很薄，適合放床邊。',en:'80 cm wide and folds flat. Fits next to a bed.'}},
+  {id:8,name:{zh:'曬衣籃＋衣架 20 支',en:'Laundry basket + 20 hangers'},price:80,cond:'worn',b:4,cat:'basket',hot:0,sale:1,seller:{zh:'柏翰',en:'Bohan'},desc:{zh:'籃子把手有一點裂，不影響使用。',en:'Small crack in the handle, still works fine.'}},
+  {id:9,name:{zh:'落地燈',en:'Floor lamp'},price:350,cond:'new',b:2,cat:'lamp',hot:0,sale:0,seller:{zh:'宇恩',en:'Yuen'},desc:{zh:'高 150 公分，暖光，開關正常。',en:'150 cm tall, warm light, switch works.'}}
+];
+const tint=it=>TINT[it.id%4];
+const CATKEYS=['all','desk','chair','cabinet','bed','lamp','fan','books','basket'];
+const SHOTGFX=[
+  {icon:'M6 3h12v18H6zM6 12h12M10 7.5h4M10 16.5h4',ghost:'M5 2h14v20H5zM5 12h14M10 7h4M10 17h4'},
+  {icon:'M6 3h12v18H6zM6 3l12 18M18 3L6 21',ghost:'M5 2h14v20H5zM5 2l14 20M19 2L5 22'},
+  {icon:'M9 3h6v18H9zM9 12h6',ghost:'M8 2h8v20H8zM8 12h8'},
+  {icon:'M4 7h16v10H4zM7 10v4M9.5 10v4M12 10v4M15 10v4M17 10v4',ghost:'M3 7h18v10H3zM6 10v4M8 10v4M9.5 10v4M12 10v4M14 10v4M15.5 10v4M18 10v4'},
+  {icon:'M10.5 4a6.5 6.5 0 1 1 0 13a6.5 6.5 0 1 1 0-13M15.5 15.5L20 20',ghost:'M10 3a7 7 0 1 1 0 14a7 7 0 1 1 0-14M15 15l6 6M7 9l3 1.5L8 12l5 1',optional:true}
+];
+const NSHOTS=SHOTGFX.length;
+
+let savedLang='zh';
+try{const v=localStorage.getItem('dormloop-lang');if(v==='en'||v==='zh')savedLang=v;}catch(e){}
+
+const S={lang:savedLang,tab:'home',view:null,itemId:null,slot:0,building:1,drop:false,homeTab:0,cat:'all',query:'',
+  saved:[2],deal:null,dealOpen:false,orders:[{id:'o1',itemId:5,when:{zh:'今天 18:30',en:'Today 18:30'},status:1}],
+  mine:[{id:2,st:'req2',cls:'c-used'},{id:3,st:'none',cls:'c-worn'}],
+  shot:0,shots:[0,0,0,0,0],flash:false,draft:null};
+
+const T=()=>L[S.lang];
+const tx=v=>(v&&typeof v==='object')?v[S.lang]:v;
+const app=document.getElementById('app');
+let lastKey='', toastTimer=null, nextId=100;
+
+function toast(msg){
+  const t=app.querySelector('.toast');if(!t)return;
+  t.textContent=msg;t.hidden=false;
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>{t.hidden=true;},1800);
+}
+const byId=id=>items.find(x=>x.id===id);
+const isSaved=id=>S.saved.includes(id);
+const loc=it=>T().B[it.b]+(it.b===S.building?T().same_floor:'');
+
+function heartBtn(it,cls='heart'){
+  const on=isSaved(it.id);
+  return `<button class="${cls}" data-act="save" data-id="${it.id}" aria-pressed="${on}" aria-label="${on?T().save_rm:T().save_add}">${svg(I.heart,20,2)}</button>`;
+}
+function navBar(){
+  const t=T();
+  const b=(k,label,d)=>`<button data-act="nav" data-id="${k}" ${S.tab===k?'aria-current="page"':''}>${svg(d,24)}${label}</button>`;
+  return `<nav class="nav" aria-label="${t.main_menu}">${b('home',t.nav_home,I.home)}${b('saved',t.nav_saved,I.heart)}
+  <button class="sell" data-act="sell"><span>${svg(I.cam,24,2)}</span>${t.nav_sell}</button>${b('msg',t.nav_msg,I.chat)}${b('me',t.nav_me,I.user)}</nav>`;
+}
+function topBar(title){
+  return `<header class="bar"><div class="logo"><b>${svg(I.loop,18,2.2)}</b><span style="color:var(--ink)">Dorm<span>Loop</span></span></div>${title?`<h2>${title}</h2>`:''}</header>`;
+}
+function subBar(title,dark){
+  return `<header class="bar"><button class="icon-btn" data-act="back" aria-label="${T().back}">${svg(dark?I.close:I.back,22,2.2)}</button><h2 style="flex:1">${title}</h2><span style="width:44px"></span></header>`;
+}
+
+function homeList(){
+  const t=T();const q=S.query.trim().toLowerCase();
+  const list=items.filter(it=>(S.building===0||it.b===S.building)&&(S.cat==='all'||it.cat===S.cat)&&(S.homeTab===0||(S.homeTab===1?it.hot:it.sale))&&(!q||tx(it.name).toLowerCase().includes(q)));
+  const head=`<div class="sechead"><h3>${t.list_title(t.B[S.building])}</h3><span>${t.total(list.length)}</span></div>`;
+  if(!list.length) return head+`<p class="empty">${t.empty_home}</p>`;
+  return head+`<div class="grid">${list.map(it=>`<article class="card">
+    <button class="open" data-act="open" data-id="${it.id}">
+      <span class="thumb" style="height:128px;background:${tint(it)}">${svg(I[it.cat],52,1.2)}<span class="cond ${CONDCLS[it.cond]}">${t.cond[it.cond]}</span></span>
+      <span class="meta"><span class="name">${esc(tx(it.name))}</span><span class="sub">${loc(it)}</span><span class="price">NT$ ${it.price}</span></span>
+    </button>${heartBtn(it)}</article>`).join('')}</div>`;
+}
+function home(){
+  const t=T();
+  return `<div class="locbox">
+    <div class="locrow">
+      <button class="loc" data-act="drop" aria-expanded="${S.drop}" aria-haspopup="listbox">${svg(I.pin,16,2)}${t.B[S.building]}${svg(I.chev,14,2.2,'class="chev"')}</button>
+      <span class="verified">${svg(I.shield,13,2.2)}${t.verified}</span>
+    </div>
+    ${S.drop?`<div class="drop" role="listbox" aria-label="${t.choose_dorm}">${t.B.map((n,i)=>`<button role="option" data-act="bld" data-id="${i}" aria-selected="${S.building===i}">${n}<small>${t.count(i===0?items.length:items.filter(x=>x.b===i).length)}</small></button>`).join('')}</div>`:''}
+    <label class="search" for="q">${svg(I.search,18,2)}<span class="sr">${t.search_sr}</span><input id="q" type="search" value="${esc(S.query)}" placeholder="${t.search_ph}" autocomplete="off"></label>
+  </div>
+  <div class="tabs">${t.tabs.map((x,i)=>`<button data-act="htab" data-id="${i}" aria-pressed="${S.homeTab===i}">${x}</button>`).join('')}</div>
+  <section class="hero" aria-label="${t.hero_aria}">
+    <span class="tag">${t.hero_tag}</span>
+    <h3>${t.hero_h}</h3>
+    <p>${t.hero_p}</p>
+    <button data-act="sell">${t.hero_btn}</button>
+    <svg class="art" width="120" height="140" viewBox="0 0 120 140" fill="none" stroke="#F9C975" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M66 24l-12 28h34l-12-28zM71 52v24M24 76h92M32 76v60M108 76v60M84 76v60M84 100h24"/></svg>
+  </section>
+  <div class="promos">
+    <button data-act="sell"><i style="background:var(--pink-soft)">${svg(I.spark,20,2)}</i><span>${t.promo[0]}</span></button>
+    <button data-act="samefloor"><i style="background:var(--blue)">${svg(I.building,20,2)}</i><span>${t.promo[1]}</span></button>
+    <button data-act="salepromo"><i style="background:var(--yellow)">${svg(I.box,20,2)}</i><span>${t.promo[2]}</span></button>
+  </div>
+  <div class="chips" role="group" aria-label="${t.cats_aria}">${CATKEYS.map(k=>`<button data-act="cat" data-id="${k}" aria-pressed="${S.cat===k}">${svg(I[k],18,1.8)}${t.cats[k]}</button>`).join('')}</div>
+  <div id="homeList">${homeList()}</div>`;
+}
+function saved(){
+  const t=T();const list=items.filter(it=>isSaved(it.id));
+  if(!list.length) return `<p class="empty" style="margin-top:24px">${t.empty_saved}</p>`;
+  return `<div class="pad">${list.map(it=>`<div class="row">
+    <button class="open" data-act="open" data-id="${it.id}"><span class="sq" style="width:64px;height:64px;background:${tint(it)}">${svg(I[it.cat],30,1.4)}</span>
+    <span class="col"><span class="name">${esc(tx(it.name))}</span><span class="sub">${loc(it)}</span><span class="price">NT$ ${it.price}</span></span></button>
+    ${heartBtn(it,'heart" style="position:static')}</div>`).join('')}</div>`;
+}
+function msgs(){
+  const colors=['var(--blue)','var(--pink)','var(--yellow)'];
+  return `<div>${T().threads.map((m,i)=>`<div class="thread"><span class="avatar" style="background:${colors[i]}">${m[0]}</span><span class="col" style="flex:1"><span class="top">${m[1]}<small>${m[4]}</small></span><span class="sub" style="font-size:13px">${m[2]}｜${m[3]}</span></span></div>`).join('')}</div>`;
+}
+function me(){
+  const t=T();
+  const rate=(typeof S.deal==='number')?S.deal:null;
+  const rows=S.mine.map(m=>{const it=byId(m.id);
+    const priceTxt=rate===null?`NT$ ${it.price}`:(rate===0?t.free:`NT$ ${Math.round(it.price*rate)}`);
+    const old=rate===null?'':`<s class="sub" style="font-size:12px">NT$ ${it.price}</s>`;
+    return `<div class="row"><span class="sq" style="width:56px;height:56px;background:${tint(it)}">${svg(I[it.cat],28,1.4)}</span><span class="col" style="flex:1"><span class="name">${esc(tx(it.name))}</span><span class="pill ${m.cls}">${t.st[m.st]}</span></span><span class="col" style="align-items:flex-end">${old}<span class="price">${priceTxt}</span></span></div>`;}).join('');
+  const cur=S.deal===null?null:t.deal_on[String(S.deal)];
+  const menu=S.dealOpen?`<div class="dealmenu" role="menu" aria-label="${t.deal_none}">${t.deal_opts.map(o=>`<button role="menuitemradio" aria-checked="${String(S.deal)===o[0]}" data-act="deal" data-id="${o[0]}">${o[1]}${String(S.deal)===o[0]?svg(I.check,18,2.4):''}</button>`).join('')}${S.deal!==null?`<button class="cancel" role="menuitem" data-act="deal" data-id="cancel">${t.deal_cancel}</button>`:''}</div>`:'';
+  const storage=S.deal==='storage'?`<div class="storage"><b style="font-size:14px">${t.storage_title}</b><span class="sub" style="font-size:13px">${t.storage_note}</span>
+    ${t.storage_spots.map((sp,i)=>`<div class="spot"><span class="col"><span class="name">${sp[0]}</span><span class="sub">${sp[1]}</span></span><button data-act="storebook" data-id="${i}">${t.storage_btn}</button></div>`).join('')}</div>`:'';
+  return `<div class="pad">
+    <div class="profile"><span class="avatar">${t.me_initial}</span><span class="col"><b>${t.me_name}</b><span class="sub" style="font-size:13px">${t.me_sub}</span></span></div>
+    <div class="countdown"><span>${t.cd_label}</span><strong>${t.cd_time}</strong><span>${(cur&&S.deal!=='storage')?t.cd_deal(cur):t.cd_unsold(S.mine.length)}</span>
+      <button class="dealbtn" data-act="dealmenu" aria-haspopup="menu" aria-expanded="${!!S.dealOpen}"><span>${cur||t.deal_none}</span>${svg(I.chev,18,2.4)}</button>
+      ${menu}</div>
+    ${storage}
+    <h4>${t.my_listings}</h4>${rows}
+    <button class="linkrow" data-act="orders">${t.my_orders}<small>${t.orders_n(S.orders.length)}</small></button>
+    <h4>${t.settings}</h4>
+    <div class="settings">
+      <span class="lbl" id="lang-label">${svg(I.globe,18,1.8)}${t.lang_label}</span>
+      <div class="seg" role="group" aria-labelledby="lang-label">
+        <button data-act="lang" data-id="zh" aria-pressed="${S.lang==='zh'}" lang="zh-Hant">中文</button>
+        <button data-act="lang" data-id="en" aria-pressed="${S.lang==='en'}" lang="en">English</button>
+      </div>
+    </div>
+  </div>`;
+}
+function detail(){
+  const t=T();const it=byId(S.itemId);const booked=S.orders.some(o=>o.itemId===it.id);
+  return subBar(t.detail_title)+`<div class="scroll detail">
+    <div class="detail-img" style="background:${tint(it)}">${svg(I[it.cat],110,1)}<small>${t.photos}</small></div>
+    <div class="pad" style="gap:14px">
+      <div class="col" style="gap:6px"><h1>${esc(tx(it.name))}</h1><div style="display:flex;align-items:center;gap:10px"><span class="price">NT$ ${it.price}</span><span class="pill ${CONDCLS[it.cond]}">${t.cond[it.cond]}</span></div></div>
+      <p>${esc(tx(it.desc))}</p>
+      <div class="box"><b>${t.pickup_at(loc(it))}</b><small>${t.privacy}</small></div>
+      <div class="col" style="gap:8px"><b style="font-size:14px">${t.pick_time}</b><div class="slots">${t.slots.map((s,i)=>`<button data-act="slot" data-id="${i}" aria-pressed="${S.slot===i}">${s}</button>`).join('')}</div></div>
+      <div style="display:flex;align-items:center;gap:10px;padding-bottom:12px"><span class="avatar" style="width:36px;height:36px;background:var(--blue);font-size:14px">${tx(it.seller)[0]}</span><span class="sub" style="font-size:13px;color:var(--ink-2)">${t.seller(tx(it.seller))}</span></div>
+    </div></div>
+    <div class="cta">${heartBtn(it)}<button class="btn ${booked?'btn-line':'btn-main'}" data-act="book">${booked?t.booked_btn:t.book_btn}</button></div>`;
+}
+function orders(){
+  const t=T();
+  return subBar(t.my_orders)+`<div class="scroll"><div class="pad">${S.orders.map(o=>{
+    const it=byId(o.itemId);const code=String((o.itemId*1373+2468)%9000+1000);const done=o.status>=2;
+    const pill=done?'c-new':(o.status===1?'c-used':'c-worn');
+    return `<div class="order ${done?'done':''}">
+      <div style="display:flex;align-items:center;gap:12px"><span class="sq" style="width:52px;height:52px;background:${tint(it)}">${svg(I[it.cat],26,1.4)}</span>
+      <span class="col" style="flex:1"><span class="name" style="font-size:15px">${esc(tx(it.name))}</span><span class="sub">${tx(o.when)} · ${t.B[it.b]}</span></span><span class="pill ${pill}">${t.steps[o.status]}</span></div>
+      <div class="col" style="gap:6px"><span class="sub">${t.code_label}</span><div class="code" aria-label="${t.code_aria} ${code}">${code.split('').map(d=>`<span>${d}</span>`).join('')}</div></div>
+      <div class="steps">${t.steps.map((s,i)=>`<span class="${i<=o.status?'on':''}"><i></i>${s}</span>`).join('')}</div>
+      ${done?'':`<button class="btn btn-line" data-act="adv" data-id="${o.id}">${o.status===0?t.adv0:t.adv1}</button>`}
+    </div>`;}).join('')}</div></div>`;
+}
+function sell(){
+  const t=T();const finished=S.shot>=NSHOTS;const ci=Math.min(S.shot,NSHOTS-1);const cur=t.shots[ci];const g=SHOTGFX[ci];
+  const count=S.shots.filter(Boolean).length;
+  const strip=`<ol class="shotsteps" aria-label="${t.shots_aria}">${t.shots.map((s,i)=>{const c=i===S.shot?'cur':(S.shots[i]?'ok':'');
+    return `<li class="${i===S.shot?'cur':''}"><button class="${c}" data-act="pickshot" data-id="${i}" aria-label="${s[0]}${S.shots[i]?t.retake:''}">${svg(SHOTGFX[i].icon,28,1.6)}</button>${s[0]}</li>`;}).join('')}</ol>`;
+  const body=finished?`<div class="donebox"><span class="ok">${svg(I.check,36,2.5)}</span><h3>${t.done_h(count)}</h3><p>${t.done_p}</p>
+      <button class="btn btn-main" data-act="toreview" style="min-width:220px">${t.to_review}</button><button class="skip" style="justify-self:auto;text-decoration:underline" data-act="reshoot">${t.reshoot}</button></div>`
+    :`<div class="finder ${S.flash?'flash':''}"><div class="label"><em>${S.shot+1} / ${NSHOTS}</em>${cur[1]}</div>
+      <svg class="ghost" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width=".35" stroke-dasharray=".9 .6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${g.ghost}"/></svg>
+      <p>${cur[2]}</p><span class="corner c1"></span><span class="corner c2"></span><span class="corner c3"></span><span class="corner c4"></span><span class="dist">${cur[3]}</span></div>
+      <div class="shutterbar"><span></span><button class="shutter" data-act="shoot" aria-label="${t.shutter}"><span></span></button>${g.optional?`<button class="skip" data-act="skipshot">${t.skip}</button>`:'<span></span>'}</div>`;
+  return `<div class="night" style="display:flex;flex-direction:column;height:100%">${subBar(t.sell_title,true)}${strip}${body}</div>`;
+}
+function review(){
+  const t=T();const d=S.draft;
+  return subBar(t.review_title)+`<div class="scroll"><form class="pad" id="reviewForm" style="gap:16px">
+    <div class="photos">${S.shots.map((v,i)=>v?`<span style="background:${TINT[i%4]}">${t.shots[i][0]}</span>`:'').join('')}</div>
+    <div class="aibanner">${svg(I.spark,18,2)}${t.ai_banner}</div>
+    <div class="field"><label for="f-name">${t.f_name}</label><input id="f-name" value="${esc(d.name)}" required></div>
+    <div class="field"><label for="f-cat">${t.f_cat}</label><select id="f-cat">${CATKEYS.slice(1).map(k=>`<option value="${k}" ${d.cat===k?'selected':''}>${t.cats[k]}</option>`).join('')}</select></div>
+    <div class="field"><span class="lbl">${t.f_cond}</span><div class="condpick">${Object.keys(CONDCLS).map(c=>`<button type="button" data-act="cond" data-id="${c}" aria-pressed="${d.cond===c}">${t.cond[c]}</button>`).join('')}</div></div>
+    <div class="field"><label for="f-price">${t.f_price}</label><input id="f-price" type="number" inputmode="numeric" min="0" value="${esc(d.price)}"><small>${t.f_price_note}</small></div>
+    <div class="field"><span class="lbl">${t.f_place}</span><div class="box"><b>${t.B[1]}</b><small>${t.place_note}</small></div></div>
+    <button class="btn btn-main" type="submit" style="height:52px;font-size:16px">${t.publish}</button>
+  </form></div>`;
+}
+function intro(){
+  const t=T();const ic=['M4 8h3l2-3h6l2 3h3v11H4zM12 9.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 1 1 0-7','M4 21V9l8-5 8 5v12M9 21v-5h6v5','M5 12l5 5 9-10'];
+  const bg=['var(--pink)','var(--blue)','var(--yellow)'];
+  document.getElementById('intro').innerHTML=`<h1>Dorm<span>Loop</span></h1><p>${t.intro_p}</p>
+    <ul>${t.intro_li.map((x,i)=>`<li><i style="background:${bg[i]}">${svg(ic[i],20,2)}</i>${x}</li>`).join('')}</ul><small>${t.intro_small}</small>`;
+}
+
+function render(){
+  const t=T();
+  document.documentElement.lang=t.html;
+  const key=S.view||S.tab;
+  const prev=app.querySelector('.scroll');const keep=(key===lastKey&&prev)?prev.scrollTop:0;
+  let html;
+  if(S.view==='detail') html=detail();
+  else if(S.view==='orders') html=orders();
+  else if(S.view==='sell') html=sell();
+  else if(S.view==='review') html=review();
+  else{
+    const title={home:'',saved:t.title_saved,msg:t.title_msg,me:t.title_me}[S.tab];
+    const body={home:home,saved:saved,msg:msgs,me:me}[S.tab]();
+    html=topBar(title)+`<div class="scroll">${body}</div>`+navBar();
+  }
+  app.innerHTML=html+'<div class="toast" role="status" hidden></div>';
+  const sc=app.querySelector('.scroll');if(sc)sc.scrollTop=keep;
+  lastKey=key;
+}
+
+app.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]');
+  if(!el){ if(S.drop){S.drop=false;render();} return; }
+  const act=el.dataset.act, id=el.dataset.id, t=T();
+  if(act!=='drop') S.drop=false;
+  switch(act){
+    case 'nav': S.tab=id;S.view=null;break;
+    case 'drop': S.drop=!S.drop;break;
+    case 'bld': S.building=+id;break;
+    case 'htab': S.homeTab=+id;break;
+    case 'cat': S.cat=id;break;
+    case 'samefloor': S.building=1;S.cat='all';S.homeTab=0;render();toast(t.t_same);return;
+    case 'salepromo': S.building=0;S.cat='all';S.homeTab=2;render();toast(t.t_sale);return;
+    case 'open': S.view='detail';S.itemId=+id;S.slot=0;lastKey='';break;
+    case 'save': {const n=+id;const on=isSaved(n);S.saved=on?S.saved.filter(x=>x!==n):S.saved.concat(n);render();toast(on?t.t_unsaved:t.t_saved);return;}
+    case 'back': S.view=(S.view==='review')?'sell':null;break;
+    case 'slot': S.slot=+id;break;
+    case 'book': {const it=byId(S.itemId);if(S.orders.some(o=>o.itemId===it.id)){S.view='orders';break;}
+      S.orders=[{id:'o'+Date.now(),itemId:it.id,when:{zh:L.zh.slots[S.slot],en:L.en.slots[S.slot]},status:0}].concat(S.orders);S.view='orders';render();toast(t.t_booked);return;}
+    case 'orders': S.view='orders';break;
+    case 'adv': {const o=S.orders.find(x=>x.id===id);o.status++;render();toast(o.status===1?t.t_conf:t.t_done);return;}
+    case 'dealmenu': S.dealOpen=!S.dealOpen;break;
+    case 'deal': {S.dealOpen=false;
+      if(id==='cancel'){S.deal=null;render();toast(t.t_bundle_off);return;}
+      if(id==='storage'){S.deal='storage';break;}
+      S.deal=+id;const lbl=t.deal_opts.find(o=>o[0]===id)[1];render();toast(t.t_deal(lbl));return;}
+    case 'storebook': toast(t.t_storage);return;
+    case 'lang': {if(S.lang===id)return;S.lang=id;try{localStorage.setItem('dormloop-lang',id);}catch(err){}intro();render();toast(T().t_lang);return;}
+    case 'sell': S.view='sell';S.shot=0;S.shots=[0,0,0,0,0];break;
+    case 'pickshot': S.shot=+id;break;
+    case 'shoot': {S.shots[S.shot]=1;let n=S.shot+1;while(n<NSHOTS&&S.shots[n])n++;S.shot=n;S.flash=true;render();S.flash=false;return;}
+    case 'skipshot': {let n=S.shot+1;while(n<NSHOTS&&S.shots[n])n++;S.shot=n;break;}
+    case 'reshoot': S.shot=0;S.shots=[0,0,0,0,0];break;
+    case 'toreview': S.draft={name:t.draft_name,cat:'cabinet',cond:'used',price:300};S.view='review';break;
+    case 'cond': S.draft.cond=id;break;
+  }
+  render();
+});
+app.addEventListener('input',e=>{
+  if(e.target.id==='q'){S.query=e.target.value;const box=document.getElementById('homeList');if(box)box.innerHTML=homeList();}
+  if(S.draft){ if(e.target.id==='f-name')S.draft.name=e.target.value; if(e.target.id==='f-price')S.draft.price=e.target.value; }
+});
+app.addEventListener('change',e=>{ if(e.target.id==='f-cat'&&S.draft)S.draft.cat=e.target.value; });
+app.addEventListener('submit',e=>{
+  e.preventDefault();
+  const t=T();const d=S.draft;const price=Math.max(0,parseInt(d.price,10)||0);
+  const name=d.name.trim()||t.untitled;
+  const it={id:nextId++,name:{zh:name,en:name},price,cond:d.cond,b:1,cat:d.cat,hot:0,sale:0,seller:{zh:'小安',en:'An'},desc:{zh:L.zh.new_desc,en:L.en.new_desc}};
+  items.unshift(it);
+  S.mine=[{id:it.id,st:'fresh',cls:'c-new'}].concat(S.mine);
+  S.draft=null;S.view=null;S.tab='me';render();toast(t.t_published);
+});
+intro();
+render();
+})();
+</script>
