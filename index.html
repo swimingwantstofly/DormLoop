@@ -204,12 +204,17 @@ h4{margin:4px 0 0;font-size:16px;font-weight:900}
 
 .dealbtn{margin-top:6px;min-height:48px;border:0;border-radius:14px;background:var(--yellow);color:var(--ink);font-size:15px;font-weight:700;padding:0 16px;display:flex;align-items:center;justify-content:space-between;gap:8px}
 .countdown .dealbtn span{color:var(--ink);font-size:15px}
+.countdown .dealmenu span{color:inherit;font-size:15px}
 .dealbtn svg{transition:transform .2s}
 .dealbtn[aria-expanded="true"] svg{transform:rotate(180deg)}
 .dealmenu{background:var(--card);color:var(--ink);border-radius:14px;padding:6px;display:flex;flex-direction:column;box-shadow:0 8px 20px rgba(30,42,58,.18)}
 .dealmenu button{min-height:44px;border:0;border-radius:10px;background:transparent;text-align:left;padding:0 12px;font-size:15px;display:flex;align-items:center;justify-content:space-between}
 .dealmenu button[aria-checked="true"]{background:var(--mint);font-weight:700;color:var(--teal-deep)}
 .dealmenu .cancel{color:#A3324A;border-top:1px solid var(--line);border-radius:0 0 10px 10px}
+.countdown .suggest{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(255,255,255,.14);border-radius:12px;padding:8px 8px 8px 12px}
+.countdown .suggest span{font-size:13px;color:#fff;font-weight:700}
+.countdown .suggest button{min-height:36px;border:0;border-radius:9px;background:#fff;color:var(--teal-deep);font-weight:700;font-size:13px;padding:0 14px;flex-shrink:0}
+.sugtag{font-style:normal;font-size:12px;font-weight:700;color:var(--ink);background:var(--yellow);padding:2px 8px;border-radius:999px;margin-left:6px}
 .storage{background:var(--card);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;border:1.5px dashed var(--chip)}
 .storage .spot{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--soft);border-radius:12px;padding:10px 12px}
 .storage .spot button{min-height:40px;border:0;border-radius:10px;background:var(--teal-deep);color:#fff;font-weight:700;font-size:14px;padding:0 14px;flex-shrink:0}
@@ -267,8 +272,8 @@ zh:{
   cd_label:'距離退宿還有',cd_time:'2 天 14 小時',cd_bundled:'打包 8 折進行中，已推播給同棟同學',cd_unsold:n=>`還有 ${n} 件未售出`,
   bundle_on:'打包 8 折進行中 ✓（點擊取消）',bundle_off:'一鍵打包 8 折出清',
   my_listings:'我的上架',my_orders:'我的訂單',orders_n:n=>`${n} 筆 ›`,
-  deal_none:'選擇退宿出清方式',deal_opts:[['0.8','全部 8 折'],['0.6','全部 6 折'],['0.4','全部 4 折'],['0','免費送出'],['storage','尋找寄放地點']],deal_cancel:'取消優惠',
-  deal_on:{'0.8':'全部 8 折中','0.6':'全部 6 折中','0.4':'全部 4 折中','0':'免費送出中','storage':'尋找寄放地點'},cd_deal:l=>`${l}，已推播給同棟同學`,
+  deal_none:'選擇退宿出清方式',deal_opts:[['0.8','全部 8 折'],['0.5','全部 5 折'],['0','免費送出'],['storage','尋找寄放地點']],suggest:'剩不到 3 天，建議全部 5 折',suggest_btn:'套用',tag_suggest:'建議',deal_cancel:'取消優惠',
+  deal_on:{'0.8':'全部 8 折中','0.5':'全部 5 折中','0':'免費送出中','storage':'尋找寄放地點'},cd_deal:l=>`${l}，已推播給同棟同學`,
   t_deal:l=>`已推播「${l}」給男七舍的同學`,free:'免費',
   storage_title:'寄放地點（第二階段功能・示範）',storage_note:'來不及賣完？先寄放，買家之後再去取。',
   storage_spots:[['男七舍服務台','每人最多 2 件・保管 7 天'],['學生會辦公室','大型家具・保管 14 天']],storage_btn:'預約',t_storage:'已送出寄放預約（示範）',
@@ -319,8 +324,8 @@ en:{
   cd_label:'Move-out in',cd_time:'2 days 14 hrs',cd_bundled:'Bundle deal is live and sent to your building',cd_unsold:n=>`${n} items still unsold`,
   bundle_on:'Bundle 20% off is on ✓ (tap to cancel)',bundle_off:'Bundle everything at 20% off',
   my_listings:'My listings',my_orders:'My orders',orders_n:n=>`${n} ›`,
-  deal_none:'Choose a move-out deal',deal_opts:[['0.8','20% off everything'],['0.6','40% off everything'],['0.4','60% off everything'],['0','Give it all away free'],['storage','Find a storage spot']],deal_cancel:'Cancel deal',
-  deal_on:{'0.8':'20% off everything','0.6':'40% off everything','0.4':'60% off everything','0':'Giving it all away free','storage':'Find a storage spot'},cd_deal:l=>`${l}, sent to your building`,
+  deal_none:'Choose a move-out deal',deal_opts:[['0.8','20% off everything'],['0.5','50% off everything'],['0','Give it all away free'],['storage','Find a storage spot']],suggest:'Under 3 days left: we suggest 50% off',suggest_btn:'Apply',tag_suggest:'Suggested',deal_cancel:'Cancel deal',
+  deal_on:{'0.8':'20% off everything','0.5':'50% off everything','0':'Giving it all away free','storage':'Find a storage spot'},cd_deal:l=>`${l}, sent to your building`,
   t_deal:l=>`“${l}” sent to Boys’ Dorm 7`,free:'Free',
   storage_title:'Storage spots (Phase 2 · demo)',storage_note:'Can’t sell in time? Store it and buyers pick it up later.',
   storage_spots:[['Boys’ Dorm 7 front desk','Up to 2 items · kept 7 days'],['Student council office','Large items · kept 14 days']],storage_btn:'Book',t_storage:'Storage request sent (demo)',
@@ -355,6 +360,8 @@ en:{
   ]
 }};
 
+/* days left 2.6 → under 3 days → suggest 50% off */
+const SUGGEST='0.5';
 const CONDCLS={new:'c-new',used:'c-used',worn:'c-worn'};
 const TINT=['#FCEEF3','#EAF3FB','#FEF5E1','#E6F4F2'];
 const items=[
@@ -475,13 +482,14 @@ function me(){
     const old=rate===null?'':`<s class="sub" style="font-size:12px">NT$ ${it.price}</s>`;
     return `<div class="row"><span class="sq" style="width:56px;height:56px;background:${tint(it)}">${svg(I[it.cat],28,1.4)}</span><span class="col" style="flex:1"><span class="name">${esc(tx(it.name))}</span><span class="pill ${m.cls}">${t.st[m.st]}</span></span><span class="col" style="align-items:flex-end">${old}<span class="price">${priceTxt}</span></span></div>`;}).join('');
   const cur=S.deal===null?null:t.deal_on[String(S.deal)];
-  const menu=S.dealOpen?`<div class="dealmenu" role="menu" aria-label="${t.deal_none}">${t.deal_opts.map(o=>`<button role="menuitemradio" aria-checked="${String(S.deal)===o[0]}" data-act="deal" data-id="${o[0]}">${o[1]}${String(S.deal)===o[0]?svg(I.check,18,2.4):''}</button>`).join('')}${S.deal!==null?`<button class="cancel" role="menuitem" data-act="deal" data-id="cancel">${t.deal_cancel}</button>`:''}</div>`:'';
+  const menu=S.dealOpen?`<div class="dealmenu" role="menu" aria-label="${t.deal_none}">${t.deal_opts.map(o=>`<button role="menuitemradio" aria-checked="${String(S.deal)===o[0]}" data-act="deal" data-id="${o[0]}"><span>${o[1]}${o[0]===SUGGEST?` <em class="sugtag">${t.tag_suggest}</em>`:''}</span>${String(S.deal)===o[0]?svg(I.check,18,2.4):''}</button>`).join('')}${S.deal!==null?`<button class="cancel" role="menuitem" data-act="deal" data-id="cancel">${t.deal_cancel}</button>`:''}</div>`:'';
   const storage=S.deal==='storage'?`<div class="storage"><b style="font-size:14px">${t.storage_title}</b><span class="sub" style="font-size:13px">${t.storage_note}</span>
     ${t.storage_spots.map((sp,i)=>`<div class="spot"><span class="col"><span class="name">${sp[0]}</span><span class="sub">${sp[1]}</span></span><button data-act="storebook" data-id="${i}">${t.storage_btn}</button></div>`).join('')}</div>`:'';
   return `<div class="pad">
     <div class="profile"><span class="avatar">${t.me_initial}</span><span class="col"><b>${t.me_name}</b><span class="sub" style="font-size:13px">${t.me_sub}</span></span></div>
     <div class="countdown"><span>${t.cd_label}</span><strong>${t.cd_time}</strong><span>${(cur&&S.deal!=='storage')?t.cd_deal(cur):t.cd_unsold(S.mine.length)}</span>
       <button class="dealbtn" data-act="dealmenu" aria-haspopup="menu" aria-expanded="${!!S.dealOpen}"><span>${cur||t.deal_none}</span>${svg(I.chev,18,2.4)}</button>
+      ${S.deal===null&&!S.dealOpen?`<div class="suggest"><span>${t.suggest}</span><button data-act="deal" data-id="${SUGGEST}">${t.suggest_btn}</button></div>`:''}
       ${menu}</div>
     ${storage}
     <h4>${t.my_listings}</h4>${rows}
