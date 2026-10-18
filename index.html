@@ -283,12 +283,12 @@ zh:{
   t_deal:l=>`已推播「${l}」給男七舍的同學`,free:'免費',
   storage_title:'寄放地點（第二階段功能・示範）',storage_note:'來不及賣完？先寄放，買家之後再去取。',
   storage_spots:[['男七舍服務台','每人最多 2 件・保管 7 天'],['學生會辦公室','大型家具・保管 14 天']],storage_btn:'預約',t_storage:'已送出寄放預約（示範）',
-  pickup_method:'面交方式',m_room:'每週面交教室',m_room_sub:'公共空間・固定時段',m_dorm:'同棟面交',m_dorm_sub:b=>`${b}・雙方同意後開啟，確認後才公開房號`,default_tag:'預設',
+  pickup_method:'面交方式',m_room:'每週面交教室',m_room_sub:'公共空間・固定時段',m_dorm:'同棟面交',m_dorm_sub:b=>`${b}・不顯示房號，用私訊約面交地點`,dorm_msg:'私訊約地點',default_tag:'預設',
   room_name:'[教室名稱]',room_slots:['本週三 18:00–20:00','下週三 18:00–20:00'],pick_session:'選擇面交場次',
-  place_room:'每週面交教室（預設）',place_note2:'預設在每週面交教室交貨，也可以開放同棟面交。',
+  place_room:'每週面交教室（預設）',place_note2:'預設在每週面交教室交貨，也可以開放同棟面交。不會顯示你的房號。',
   settings:'設定',lang_label:'語言 Language',t_lang:'已切換為中文',
   st:{req2:'2 人預約中',none:'尚無人詢問',fresh:'剛上架'},
-  detail_title:'商品詳情',photos:'1 / 4 張照片',pickup_at:b=>`取貨地點：${b}`,privacy:'為保護隱私，雙方確認預約後才會顯示房號',
+  detail_title:'商品詳情',photos:'1 / 4 張照片',pickup_at:b=>`取貨地點：${b}`,privacy:'為保護隱私，App 不會顯示房號',
   pick_time:'選擇面交時間',seller:s=>`賣家 ${s} · 已通過政大認證`,booked_btn:'已預約，查看訂單',book_btn:'預約面交',
   slots:['今天 19:00','今天 21:00','週二 12:30','週二 18:00'],
   steps:['已預約','賣家確認','已取貨'],code_label:'取貨碼（面交時出示給賣家）',code_aria:'取貨碼',
@@ -300,7 +300,7 @@ zh:{
   to_review:'下一步：確認資訊',reshoot:'重新拍攝',shutter:'拍照',skip:'略過 ›',
   review_title:'確認商品資訊',ai_banner:'AI 已幫你填好，請確認後再上架',
   f_name:'品名',f_cat:'分類',f_cond:'使用狀況',f_price:'售價（NT$）',f_price_note:'AI 建議 NT$ 300・僅供參考，可以自己調整',
-  f_place:'面交地點',place_note:'只會顯示棟別和樓層，房號在雙方確認後才公開',publish:'上架',
+  f_place:'面交地點',place_note:'只會顯示棟別和樓層，不會顯示房號',publish:'上架',
   t_published:'已上架！同棟同學現在看得到了',draft_name:'木製雙層書架',untitled:'未命名商品',new_desc:'剛上架的商品，照片由引導拍照產生。',
   cond:{new:'近全新',used:'輕微使用',worn:'有小瑕疵'},
   B:['全部宿舍','男七舍 3F','男七舍 5F','女二舍 2F','自強十舍 4F'],
@@ -338,12 +338,12 @@ en:{
   t_deal:l=>`“${l}” sent to Boys’ Dorm 7`,free:'Free',
   storage_title:'Storage spots (Phase 2 · demo)',storage_note:'Can’t sell in time? Store it and buyers pick it up later.',
   storage_spots:[['Boys’ Dorm 7 front desk','Up to 2 items · kept 7 days'],['Student council office','Large items · kept 14 days']],storage_btn:'Book',t_storage:'Storage request sent (demo)',
-  pickup_method:'Pickup method',m_room:'Weekly pickup classroom',m_room_sub:'Public space, fixed time',m_dorm:'Meet in your building',m_dorm_sub:b=>`${b} · both must agree; room shared after confirming`,default_tag:'Default',
+  pickup_method:'Pickup method',m_room:'Weekly pickup classroom',m_room_sub:'Public space, fixed time',m_dorm:'Meet in your building',m_dorm_sub:b=>`${b} · no room number; agree on the spot by message`,dorm_msg:'spot set by message',default_tag:'Default',
   room_name:'[Classroom name]',room_slots:['This Wed 18:00–20:00','Next Wed 18:00–20:00'],pick_session:'Pick a session',
-  place_room:'Weekly pickup classroom (default)',place_note2:'Items are handed over in the weekly classroom by default. You can also allow pickup in your building.',
+  place_room:'Weekly pickup classroom (default)',place_note2:'Items are handed over in the weekly classroom by default. You can also allow pickup in your building. Your room number is never shown.',
   settings:'Settings',lang_label:'語言 Language',t_lang:'Switched to English',
   st:{req2:'2 requests',none:'No requests yet',fresh:'Just listed'},
-  detail_title:'Item details',photos:'1 / 4 photos',pickup_at:b=>`Pickup: ${b}`,privacy:'The room number is shown only after both sides confirm',
+  detail_title:'Item details',photos:'1 / 4 photos',pickup_at:b=>`Pickup: ${b}`,privacy:'For privacy, the app never shows room numbers',
   pick_time:'Pick a pickup time',seller:s=>`Seller ${s} · NCCU verified`,booked_btn:'Requested, view order',book_btn:'Request pickup',
   slots:['Today 19:00','Today 21:00','Tue 12:30','Tue 18:00'],
   steps:['Requested','Confirmed','Picked up'],code_label:'Pickup code (show it to the seller)',code_aria:'Pickup code',
@@ -355,7 +355,7 @@ en:{
   to_review:'Next: check details',reshoot:'Retake all',shutter:'Take photo',skip:'Skip ›',
   review_title:'Check your listing',ai_banner:'AI filled this in. Check it before you publish.',
   f_name:'Item name',f_cat:'Category',f_cond:'Condition',f_price:'Price (NT$)',f_price_note:'AI suggests NT$ 300. For reference only, change it if you like.',
-  f_place:'Pickup spot',place_note:'Only the building and floor are shown. The room number appears after both sides confirm.',publish:'Publish',
+  f_place:'Pickup spot',place_note:'Only the building and floor are shown, never the room number.',publish:'Publish',
   t_published:'Published! Your building can see it now.',draft_name:'Wooden 2-tier shelf',untitled:'Untitled item',new_desc:'Just listed. Photos taken with guided capture.',
   cond:{new:'Like new',used:'Lightly used',worn:'Minor flaws'},
   B:['All dorms','Boys’ Dorm 7, 3F','Boys’ Dorm 7, 5F','Girls’ Dorm 2, 2F','Ziqiang 10, 4F'],
@@ -539,7 +539,7 @@ function orders(){
     const pill=done?'c-new':(o.status===1?'c-used':'c-worn');
     return `<div class="order ${done?'done':''}">
       <div style="display:flex;align-items:center;gap:12px"><span class="sq" style="width:52px;height:52px;background:${tint(it)}">${svg(I[it.cat],26,1.4)}</span>
-      <span class="col" style="flex:1"><span class="name" style="font-size:15px">${esc(tx(it.name))}</span><span class="sub">${tx(o.when)} · ${o.method==='dorm'?t.B[it.b]:t.room_name}</span></span><span class="pill ${pill}">${t.steps[o.status]}</span></div>
+      <span class="col" style="flex:1"><span class="name" style="font-size:15px">${esc(tx(it.name))}</span><span class="sub">${tx(o.when)} · ${o.method==='dorm'?t.B[it.b]+' · '+t.dorm_msg:t.room_name}</span></span><span class="pill ${pill}">${t.steps[o.status]}</span></div>
       <div class="col" style="gap:6px"><span class="sub">${t.code_label}</span><div class="code" aria-label="${t.code_aria} ${code}">${code.split('').map(d=>`<span>${d}</span>`).join('')}</div></div>
       <div class="steps">${t.steps.map((s,i)=>`<span class="${i<=o.status?'on':''}"><i></i>${s}</span>`).join('')}</div>
       ${done?'':`<button class="btn btn-line" data-act="adv" data-id="${o.id}">${o.status===0?t.adv0:t.adv1}</button>`}
