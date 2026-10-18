@@ -218,6 +218,12 @@ h4{margin:4px 0 0;font-size:16px;font-weight:900}
 .storage{background:var(--card);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;border:1.5px dashed var(--chip)}
 .storage .spot{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--soft);border-radius:12px;padding:10px 12px}
 .storage .spot button{min-height:40px;border:0;border-radius:10px;background:var(--teal-deep);color:#fff;font-weight:700;font-size:14px;padding:0 14px;flex-shrink:0}
+.methods{display:flex;flex-direction:column;gap:8px}
+.method{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);border:1.5px solid var(--chip);border-radius:14px;padding:12px 14px;min-height:64px}
+.method[aria-pressed="true"]{border-color:var(--teal-deep);background:#F2FAF8}
+.method .radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--chip);flex-shrink:0;box-sizing:border-box}
+.method[aria-pressed="true"] .radio{border:6px solid var(--teal-deep)}
+.method b{font-size:15px}
 .settings{background:var(--card);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
 .settings .lbl{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
 .seg{display:flex;background:var(--soft);border-radius:12px;padding:4px;gap:4px}
@@ -277,6 +283,9 @@ zh:{
   t_deal:l=>`已推播「${l}」給男七舍的同學`,free:'免費',
   storage_title:'寄放地點（第二階段功能・示範）',storage_note:'來不及賣完？先寄放，買家之後再去取。',
   storage_spots:[['男七舍服務台','每人最多 2 件・保管 7 天'],['學生會辦公室','大型家具・保管 14 天']],storage_btn:'預約',t_storage:'已送出寄放預約（示範）',
+  pickup_method:'面交方式',m_room:'每週面交教室',m_room_sub:'公共空間・固定時段',m_dorm:'同棟面交',m_dorm_sub:b=>`${b}・雙方同意後開啟，確認後才公開房號`,default_tag:'預設',
+  room_name:'[教室名稱]',room_slots:['本週三 18:00–20:00','下週三 18:00–20:00'],pick_session:'選擇面交場次',
+  place_room:'每週面交教室（預設）',place_note2:'預設在每週面交教室交貨，也可以開放同棟面交。',
   settings:'設定',lang_label:'語言 Language',t_lang:'已切換為中文',
   st:{req2:'2 人預約中',none:'尚無人詢問',fresh:'剛上架'},
   detail_title:'商品詳情',photos:'1 / 4 張照片',pickup_at:b=>`取貨地點：${b}`,privacy:'為保護隱私，雙方確認預約後才會顯示房號',
@@ -329,6 +338,9 @@ en:{
   t_deal:l=>`“${l}” sent to Boys’ Dorm 7`,free:'Free',
   storage_title:'Storage spots (Phase 2 · demo)',storage_note:'Can’t sell in time? Store it and buyers pick it up later.',
   storage_spots:[['Boys’ Dorm 7 front desk','Up to 2 items · kept 7 days'],['Student council office','Large items · kept 14 days']],storage_btn:'Book',t_storage:'Storage request sent (demo)',
+  pickup_method:'Pickup method',m_room:'Weekly pickup classroom',m_room_sub:'Public space, fixed time',m_dorm:'Meet in your building',m_dorm_sub:b=>`${b} · both must agree; room shared after confirming`,default_tag:'Default',
+  room_name:'[Classroom name]',room_slots:['This Wed 18:00–20:00','Next Wed 18:00–20:00'],pick_session:'Pick a session',
+  place_room:'Weekly pickup classroom (default)',place_note2:'Items are handed over in the weekly classroom by default. You can also allow pickup in your building.',
   settings:'Settings',lang_label:'語言 Language',t_lang:'Switched to English',
   st:{req2:'2 requests',none:'No requests yet',fresh:'Just listed'},
   detail_title:'Item details',photos:'1 / 4 photos',pickup_at:b=>`Pickup: ${b}`,privacy:'The room number is shown only after both sides confirm',
@@ -390,7 +402,7 @@ let savedLang='zh';
 try{const v=localStorage.getItem('dormloop-lang');if(v==='en'||v==='zh')savedLang=v;}catch(e){}
 
 const S={lang:savedLang,tab:'home',view:null,itemId:null,slot:0,building:1,drop:false,homeTab:0,cat:'all',query:'',
-  saved:[2],deal:null,dealOpen:false,orders:[{id:'o1',itemId:5,when:{zh:'今天 18:30',en:'Today 18:30'},status:1}],
+  saved:[2],deal:null,dealOpen:false,method:'room',orders:[{id:'o1',itemId:5,method:'room',when:{zh:'本週三 18:00–20:00',en:'This Wed 18:00–20:00'},status:1}],
   mine:[{id:2,st:'req2',cls:'c-used'},{id:3,st:'none',cls:'c-worn'}],
   shot:0,shots:[0,0,0,0,0],flash:false,draft:null};
 
@@ -511,8 +523,11 @@ function detail(){
     <div class="pad" style="gap:14px">
       <div class="col" style="gap:6px"><h1>${esc(tx(it.name))}</h1><div style="display:flex;align-items:center;gap:10px"><span class="price">NT$ ${it.price}</span><span class="pill ${CONDCLS[it.cond]}">${t.cond[it.cond]}</span></div></div>
       <p>${esc(tx(it.desc))}</p>
-      <div class="box"><b>${t.pickup_at(loc(it))}</b><small>${t.privacy}</small></div>
-      <div class="col" style="gap:8px"><b style="font-size:14px">${t.pick_time}</b><div class="slots">${t.slots.map((s,i)=>`<button data-act="slot" data-id="${i}" aria-pressed="${S.slot===i}">${s}</button>`).join('')}</div></div>
+      <div class="col" style="gap:8px"><b style="font-size:14px">${t.pickup_method}</b><div class="methods">
+        <button class="method" data-act="method" data-id="room" aria-pressed="${S.method==='room'}"><span class="radio"></span><span class="col" style="flex:1"><b>${t.m_room}</b><span class="sub">${t.room_name} · ${t.m_room_sub}</span></span><em class="sugtag">${t.default_tag}</em></button>
+        <button class="method" data-act="method" data-id="dorm" aria-pressed="${S.method==='dorm'}"><span class="radio"></span><span class="col" style="flex:1"><b>${t.m_dorm}</b><span class="sub">${t.m_dorm_sub(t.B[it.b])}</span></span></button>
+      </div></div>
+      <div class="col" style="gap:8px"><b style="font-size:14px">${S.method==='room'?t.pick_session:t.pick_time}</b><div class="slots">${(S.method==='room'?t.room_slots:t.slots).map((s,i)=>`<button data-act="slot" data-id="${i}" aria-pressed="${S.slot===i}">${s}</button>`).join('')}</div></div>
       <div style="display:flex;align-items:center;gap:10px;padding-bottom:12px"><span class="avatar" style="width:36px;height:36px;background:var(--blue);font-size:14px">${tx(it.seller)[0]}</span><span class="sub" style="font-size:13px;color:var(--ink-2)">${t.seller(tx(it.seller))}</span></div>
     </div></div>
     <div class="cta">${heartBtn(it)}<button class="btn ${booked?'btn-line':'btn-main'}" data-act="book">${booked?t.booked_btn:t.book_btn}</button></div>`;
@@ -524,7 +539,7 @@ function orders(){
     const pill=done?'c-new':(o.status===1?'c-used':'c-worn');
     return `<div class="order ${done?'done':''}">
       <div style="display:flex;align-items:center;gap:12px"><span class="sq" style="width:52px;height:52px;background:${tint(it)}">${svg(I[it.cat],26,1.4)}</span>
-      <span class="col" style="flex:1"><span class="name" style="font-size:15px">${esc(tx(it.name))}</span><span class="sub">${tx(o.when)} · ${t.B[it.b]}</span></span><span class="pill ${pill}">${t.steps[o.status]}</span></div>
+      <span class="col" style="flex:1"><span class="name" style="font-size:15px">${esc(tx(it.name))}</span><span class="sub">${tx(o.when)} · ${o.method==='dorm'?t.B[it.b]:t.room_name}</span></span><span class="pill ${pill}">${t.steps[o.status]}</span></div>
       <div class="col" style="gap:6px"><span class="sub">${t.code_label}</span><div class="code" aria-label="${t.code_aria} ${code}">${code.split('').map(d=>`<span>${d}</span>`).join('')}</div></div>
       <div class="steps">${t.steps.map((s,i)=>`<span class="${i<=o.status?'on':''}"><i></i>${s}</span>`).join('')}</div>
       ${done?'':`<button class="btn btn-line" data-act="adv" data-id="${o.id}">${o.status===0?t.adv0:t.adv1}</button>`}
@@ -552,7 +567,7 @@ function review(){
     <div class="field"><label for="f-cat">${t.f_cat}</label><select id="f-cat">${CATKEYS.slice(1).map(k=>`<option value="${k}" ${d.cat===k?'selected':''}>${t.cats[k]}</option>`).join('')}</select></div>
     <div class="field"><span class="lbl">${t.f_cond}</span><div class="condpick">${Object.keys(CONDCLS).map(c=>`<button type="button" data-act="cond" data-id="${c}" aria-pressed="${d.cond===c}">${t.cond[c]}</button>`).join('')}</div></div>
     <div class="field"><label for="f-price">${t.f_price}</label><input id="f-price" type="number" inputmode="numeric" min="0" value="${esc(d.price)}"><small>${t.f_price_note}</small></div>
-    <div class="field"><span class="lbl">${t.f_place}</span><div class="box"><b>${t.B[1]}</b><small>${t.place_note}</small></div></div>
+    <div class="field"><span class="lbl">${t.f_place}</span><div class="box"><b>${t.place_room}</b><small>${t.place_note2}</small></div></div>
     <button class="btn btn-main" type="submit" style="height:52px;font-size:16px">${t.publish}</button>
   </form></div>`;
 }
@@ -596,12 +611,13 @@ app.addEventListener('click',e=>{
     case 'cat': S.cat=id;break;
     case 'samefloor': S.building=1;S.cat='all';S.homeTab=0;render();toast(t.t_same);return;
     case 'salepromo': S.building=0;S.cat='all';S.homeTab=2;render();toast(t.t_sale);return;
-    case 'open': S.view='detail';S.itemId=+id;S.slot=0;lastKey='';break;
+    case 'open': S.view='detail';S.itemId=+id;S.slot=0;S.method='room';lastKey='';break;
+    case 'method': S.method=id;S.slot=0;break;
     case 'save': {const n=+id;const on=isSaved(n);S.saved=on?S.saved.filter(x=>x!==n):S.saved.concat(n);render();toast(on?t.t_unsaved:t.t_saved);return;}
     case 'back': S.view=(S.view==='review')?'sell':null;break;
     case 'slot': S.slot=+id;break;
     case 'book': {const it=byId(S.itemId);if(S.orders.some(o=>o.itemId===it.id)){S.view='orders';break;}
-      S.orders=[{id:'o'+Date.now(),itemId:it.id,when:{zh:L.zh.slots[S.slot],en:L.en.slots[S.slot]},status:0}].concat(S.orders);S.view='orders';render();toast(t.t_booked);return;}
+      const sk=S.method==='room'?'room_slots':'slots';S.orders=[{id:'o'+Date.now(),itemId:it.id,method:S.method,when:{zh:L.zh[sk][S.slot],en:L.en[sk][S.slot]},status:0}].concat(S.orders);S.view='orders';render();toast(t.t_booked);return;}
     case 'orders': S.view='orders';break;
     case 'adv': {const o=S.orders.find(x=>x.id===id);o.status++;render();toast(o.status===1?t.t_conf:t.t_done);return;}
     case 'dealmenu': S.dealOpen=!S.dealOpen;break;
