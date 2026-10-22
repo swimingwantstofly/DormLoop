@@ -224,6 +224,9 @@ h4{margin:4px 0 0;font-size:16px;font-weight:900}
 .method .radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--chip);flex-shrink:0;box-sizing:border-box}
 .method[aria-pressed="true"] .radio{border:6px solid var(--teal-deep)}
 .method b{font-size:15px}
+.pricenote{display:flex;gap:8px;align-items:flex-start;background:#FEF3D9;border:1px solid var(--yellow);border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.55;color:var(--ink)}
+.pricenote svg{flex-shrink:0;margin-top:1px;color:#8A5A00}
+.aitag{font-size:11px;font-weight:700;color:var(--ink);background:var(--yellow);padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:1px}
 .settings{background:var(--card);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
 .settings .lbl{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
 .seg{display:flex;background:var(--soft);border-radius:12px;padding:4px;gap:4px}
@@ -299,7 +302,7 @@ zh:{
   done_h:n=>`拍好 ${n} 張照片了！`,done_p:'AI 已辨識品項、尺寸與使用狀況，<br>下一步幫你確認商品資訊。',
   to_review:'下一步：確認資訊',reshoot:'重新拍攝',shutter:'拍照',skip:'略過 ›',
   review_title:'確認商品資訊',ai_banner:'AI 已幫你填好，請確認後再上架',
-  f_name:'品名',f_cat:'分類',f_cond:'使用狀況',f_price:'售價（NT$）',f_price_note:'AI 建議 NT$ 300・僅供參考，可以自己調整',
+  f_name:'品名',f_cat:'分類',f_cond:'使用狀況',f_price:'售價（NT$）',f_price_note:'NT$ 300 只是 AI 依品項和狀況估算的建議價格，不是定價。請依物品實際狀況自己決定，可以直接修改上面的金額。',ai_tag:'AI 建議',
   f_place:'面交地點',place_note:'只會顯示棟別和樓層，不會顯示房號',publish:'上架',
   t_published:'已上架！同棟同學現在看得到了',draft_name:'木製雙層書架',untitled:'未命名商品',new_desc:'剛上架的商品，照片由引導拍照產生。',
   cond:{new:'近全新',used:'輕微使用',worn:'有小瑕疵'},
@@ -354,7 +357,7 @@ en:{
   done_h:n=>`${n} photos taken!`,done_p:'AI has recognised the item, size and condition.<br>Next, check the details.',
   to_review:'Next: check details',reshoot:'Retake all',shutter:'Take photo',skip:'Skip ›',
   review_title:'Check your listing',ai_banner:'AI filled this in. Check it before you publish.',
-  f_name:'Item name',f_cat:'Category',f_cond:'Condition',f_price:'Price (NT$)',f_price_note:'AI suggests NT$ 300. For reference only, change it if you like.',
+  f_name:'Item name',f_cat:'Category',f_cond:'Condition',f_price:'Price (NT$)',f_price_note:'NT$ 300 is only an AI suggestion based on the item and its condition, not a set price. Decide the final price yourself; you can edit it above.',ai_tag:'AI suggested',
   f_place:'Pickup spot',place_note:'Only the building and floor are shown, never the room number.',publish:'Publish',
   t_published:'Published! Your building can see it now.',draft_name:'Wooden 2-tier shelf',untitled:'Untitled item',new_desc:'Just listed. Photos taken with guided capture.',
   cond:{new:'Like new',used:'Lightly used',worn:'Minor flaws'},
@@ -566,7 +569,7 @@ function review(){
     <div class="field"><label for="f-name">${t.f_name}</label><input id="f-name" value="${esc(d.name)}" required></div>
     <div class="field"><label for="f-cat">${t.f_cat}</label><select id="f-cat">${CATKEYS.slice(1).map(k=>`<option value="${k}" ${d.cat===k?'selected':''}>${t.cats[k]}</option>`).join('')}</select></div>
     <div class="field"><span class="lbl">${t.f_cond}</span><div class="condpick">${Object.keys(CONDCLS).map(c=>`<button type="button" data-act="cond" data-id="${c}" aria-pressed="${d.cond===c}">${t.cond[c]}</button>`).join('')}</div></div>
-    <div class="field"><label for="f-price">${t.f_price}</label><input id="f-price" type="number" inputmode="numeric" min="0" value="${esc(d.price)}"><small>${t.f_price_note}</small></div>
+    <div class="field"><label for="f-price">${t.f_price}<span class="aitag">${t.ai_tag}</span></label><input id="f-price" type="number" inputmode="numeric" min="0" value="${esc(d.price)}" aria-describedby="price-note"><div class="pricenote" id="price-note" role="note">${svg('M12 3a9 9 0 1 1 0 18a9 9 0 1 1 0-18M12 8v5M12 16.5h.01',18,2.2)}<span>${t.f_price_note}</span></div></div>
     <div class="field"><span class="lbl">${t.f_place}</span><div class="box"><b>${t.place_room}</b><small>${t.place_note2}</small></div></div>
     <button class="btn btn-main" type="submit" style="height:52px;font-size:16px">${t.publish}</button>
   </form></div>`;
@@ -651,6 +654,29 @@ app.addEventListener('submit',e=>{
   S.mine=[{id:it.id,st:'fresh',cls:'c-new'}].concat(S.mine);
   S.draft=null;S.view=null;S.tab='me';render();toast(t.t_published);
 });
+/* Deep links for importing single screens, e.g. #me, #orders-en */
+(function(){
+  let h=(location.hash||'').slice(1).toLowerCase();
+  if(h.endsWith('-en')){S.lang='en';h=h.slice(0,-3);} else if(h.endsWith('-zh')){S.lang='zh';h=h.slice(0,-3);}
+  const T2=L[S.lang];
+  switch(h){
+    case 'drop': S.drop=true;break;
+    case 'saved': S.tab='saved';break;
+    case 'msg': S.tab='msg';break;
+    case 'me': S.tab='me';break;
+    case 'deal': S.tab='me';S.dealOpen=true;break;
+    case 'deal-on': S.tab='me';S.deal=0.5;break;
+    case 'storage': S.tab='me';S.deal='storage';break;
+    case 'sell': S.view='sell';break;
+    case 'sell-3': S.view='sell';S.shot=3;S.shots=[1,1,1,0,0];break;
+    case 'sell-done': S.view='sell';S.shot=5;S.shots=[1,1,1,1,0];break;
+    case 'review': S.view='review';S.shots=[1,1,1,1,0];S.draft={name:T2.draft_name,cat:'cabinet',cond:'used',price:300};break;
+    case 'detail': S.view='detail';S.itemId=2;break;
+    case 'detail-dorm': S.view='detail';S.itemId=2;S.method='dorm';break;
+    case 'orders': S.view='orders';S.orders=[{id:'o0',itemId:2,method:'room',when:{zh:L.zh.room_slots[0],en:L.en.room_slots[0]},status:0}].concat(S.orders);break;
+  }
+  window.addEventListener('hashchange',()=>location.reload());
+})();
 intro();
 render();
 })();
