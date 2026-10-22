@@ -227,6 +227,33 @@ h4{margin:4px 0 0;font-size:16px;font-weight:900}
 .pricenote{display:flex;gap:8px;align-items:flex-start;background:#FEF3D9;border:1px solid var(--yellow);border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.55;color:var(--ink)}
 .pricenote svg{flex-shrink:0;margin-top:1px;color:#8A5A00}
 .aitag{font-size:11px;font-weight:700;color:var(--ink);background:var(--yellow);padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:1px}
+.login{display:flex;flex-direction:column;height:100%;background:linear-gradient(160deg,#0B9B8A 0%,#087A6D 55%,#06594F 100%);color:#fff;position:relative;overflow:hidden}
+.login .top{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:40px 24px 20px;text-align:center;position:relative}
+.login .mark{width:88px;height:88px;border-radius:26px;background:#fff;color:var(--teal-deep);display:grid;place-items:center;box-shadow:0 14px 34px rgba(0,0,0,.2)}
+.login h1{font-family:var(--logo);font-size:42px;margin:4px 0 0;letter-spacing:.3px;line-height:1}
+.login h1 span{color:var(--yellow)}
+.login .tagline{font-size:15px;color:var(--on-teal);margin:0;line-height:1.6}
+.login .badges{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.login .badges span{font-size:12px;font-weight:700;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);padding:5px 10px;border-radius:999px;display:flex;gap:5px;align-items:center}
+.login .deco{position:absolute;color:#fff;opacity:.16;pointer-events:none}
+.login .langbtn{position:absolute;top:12px;right:12px;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.12);color:#fff;font-size:13px;font-weight:700;z-index:2}
+.login .sheet{background:var(--card);color:var(--ink);border-radius:28px 28px 0 0;padding:26px 20px calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px;box-shadow:0 -10px 30px rgba(0,0,0,.12)}
+.login .sheet h2{margin:0;font-size:22px;font-weight:900}
+.login .sheet .lead{margin:0;font-size:14px;color:var(--muted);line-height:1.6}
+.gbtn{min-height:54px;border-radius:14px;border:0;background:var(--teal-deep);color:#fff;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 6px 16px rgba(8,122,109,.28)}
+.or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.emailrow{display:flex;gap:8px}
+.emailrow input{flex:1;min-width:0;height:48px;border-radius:12px;border:1.5px solid var(--chip);background:var(--card);padding:0 12px;font-size:15px}
+.emailrow input[aria-invalid="true"]{border-color:#A3324A}
+.emailrow button{min-height:48px;padding:0 16px;border-radius:12px;border:1.5px solid var(--ink);background:var(--card);font-weight:700;font-size:15px;flex-shrink:0}
+.lerr{margin:-4px 0 0;font-size:13px;color:#A3324A}
+.fine{margin:2px 0 0;font-size:12px;color:var(--muted);text-align:center;line-height:1.6}
+.verifying{position:absolute;inset:0;background:rgba(6,89,79,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#fff;z-index:30;font-size:15px;font-weight:700}
+.spin{width:44px;height:44px;border-radius:50%;border:4px solid rgba(255,255,255,.3);border-top-color:#fff;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation-duration:2.4s}}
+.logout{min-height:48px;border-radius:14px;border:1.5px solid #E7C3CC;background:var(--card);color:#A3324A;font-weight:700;font-size:15px}
 .settings{background:var(--card);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
 .settings .lbl{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
 .seg{display:flex;background:var(--soft);border-radius:12px;padding:4px;gap:4px}
@@ -289,6 +316,7 @@ zh:{
   pickup_method:'面交方式',m_room:'每週面交教室',m_room_sub:'公共空間・固定時段',m_dorm:'同棟面交',dorm_note:'App 不會顯示房號，面交地點請用私訊約。',m_dorm_sub:b=>`${b}・不顯示房號，用私訊約面交地點`,dorm_msg:'私訊約地點',default_tag:'預設',
   room_name:'[教室名稱]',room_slots:['本週三 18:00–20:00','下週三 18:00–20:00'],pick_session:'選擇面交場次',
   place_room:'同棟面交',place_note2:'只會顯示棟別和樓層，不會顯示你的房號，面交地點用私訊約。',
+  login_tag:'退宿家具，留給同棟的下一位',login_badges:['政大校內認證','不顯示房號','AI 快速上架'],login_h:'歡迎來到 DormLoop',login_sub:'僅限政大學生使用，請用學校帳號登入。',g_btn:'使用政大 Google 帳號登入',or:'或用學校信箱',email_ph:'政大信箱（@nccu.edu.tw）',email_label:'政大信箱',email_btn:'繼續',email_err:'請輸入 @nccu.edu.tw 結尾的政大信箱',verifying:'正在驗證政大帳號…',t_welcome:'登入成功，歡迎回來！',fine:'示範原型：不會真的登入，也不會收集任何資料。',logout:'登出',lang_switch:'EN',t_logout:'已登出',
   settings:'設定',lang_label:'語言 Language',t_lang:'已切換為中文',
   st:{req2:'2 人預約中',none:'尚無人詢問',fresh:'剛上架'},
   detail_title:'商品詳情',photos:'1 / 4 張照片',pickup_at:b=>`取貨地點：${b}`,privacy:'為保護隱私，App 不會顯示房號',
@@ -344,6 +372,7 @@ en:{
   pickup_method:'Pickup method',m_room:'Weekly pickup classroom',m_room_sub:'Public space, fixed time',m_dorm:'Meet in your building',dorm_note:'Room numbers are never shown. Agree on the exact spot by private message.',m_dorm_sub:b=>`${b} · no room number; agree on the spot by message`,dorm_msg:'spot set by message',default_tag:'Default',
   room_name:'[Classroom name]',room_slots:['This Wed 18:00–20:00','Next Wed 18:00–20:00'],pick_session:'Pick a session',
   place_room:'Meet in your building',place_note2:'Only the building and floor are shown, never your room number. Agree on the spot by private message.',
+  login_tag:'Pass your dorm furniture on to the next student.',login_badges:['NCCU verified','No room numbers','AI quick listing'],login_h:'Welcome to DormLoop',login_sub:'For NCCU students only. Sign in with your school account.',g_btn:'Sign in with NCCU Google account',or:'or use your school email',email_ph:'NCCU email (@nccu.edu.tw)',email_label:'NCCU email',email_btn:'Continue',email_err:'Please use an email ending in @nccu.edu.tw',verifying:'Verifying your NCCU account…',t_welcome:'Signed in. Welcome back!',fine:'Demo prototype: no real sign-in, and no data is collected.',logout:'Sign out',lang_switch:'中文',t_logout:'Signed out',
   settings:'Settings',lang_label:'語言 Language',t_lang:'Switched to English',
   st:{req2:'2 requests',none:'No requests yet',fresh:'Just listed'},
   detail_title:'Item details',photos:'1 / 4 photos',pickup_at:b=>`Pickup: ${b}`,privacy:'For privacy, the app never shows room numbers',
@@ -517,6 +546,7 @@ function me(){
         <button data-act="lang" data-id="en" aria-pressed="${S.lang==='en'}" lang="en">English</button>
       </div>
     </div>
+    <button class="logout" data-act="logout">${t.logout}</button>
   </div>`;
 }
 function detail(){
@@ -578,13 +608,43 @@ function intro(){
     <ul>${t.intro_li.map((x,i)=>`<li><i style="background:${bg[i]}">${svg(ic[i],20,2)}</i>${x}</li>`).join('')}</ul><small>${t.intro_small}</small>`;
 }
 
+function login(){
+  const t=T();
+  const cap='M2 9l10-5 10 5-10 5zM6 11v5c3 2.2 9 2.2 12 0v-5M22 9v6';
+  return `<div class="login">
+    <button class="langbtn" data-act="lang" data-id="${S.lang==='zh'?'en':'zh'}">${t.lang_switch}</button>
+    <svg class="deco" style="left:-18px;top:70px" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${I.lamp}"/></svg>
+    <svg class="deco" style="right:-24px;top:200px" width="150" height="150" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${I.cabinet}"/></svg>
+    <div class="top">
+      <span class="mark">${svg(I.loop,46,2.2)}</span>
+      <h1>Dorm<span>Loop</span></h1>
+      <p class="tagline">${t.login_tag}</p>
+      <div class="badges">${t.login_badges.map((b,i)=>`<span>${svg([I.shield,I.home,I.spark][i],13,2.2)}${b}</span>`).join('')}</div>
+    </div>
+    <form class="sheet" id="loginForm" novalidate>
+      <h2>${t.login_h}</h2>
+      <p class="lead">${t.login_sub}</p>
+      <button type="button" class="gbtn" data-act="glogin">${svg(cap,22,2)}${t.g_btn}</button>
+      <div class="or">${t.or}</div>
+      <div class="emailrow"><label for="login-email" class="sr">${t.email_label}</label><input id="login-email" type="email" inputmode="email" autocomplete="email" placeholder="${t.email_ph}" value="${esc(S.email||'')}" aria-invalid="${!!S.emailErr}" aria-describedby="login-err"><button type="submit">${t.email_btn}</button></div>
+      ${S.emailErr?`<p class="lerr" id="login-err" role="alert">${t.email_err}</p>`:''}
+      <p class="fine">${t.fine}</p>
+    </form>
+    ${S.verifying?`<div class="verifying" role="status"><span class="spin"></span>${t.verifying}</div>`:''}
+  </div>`;
+}
+function signIn(){
+  S.verifying=true;render();
+  setTimeout(()=>{S.verifying=false;S.view=null;S.tab='home';S.emailErr=false;render();toast(T().t_welcome);},1200);
+}
 function render(){
   const t=T();
   document.documentElement.lang=t.html;
   const key=S.view||S.tab;
   const prev=app.querySelector('.scroll');const keep=(key===lastKey&&prev)?prev.scrollTop:0;
   let html;
-  if(S.view==='detail') html=detail();
+  if(S.view==='login') html=login();
+  else if(S.view==='detail') html=detail();
   else if(S.view==='orders') html=orders();
   else if(S.view==='sell') html=sell();
   else if(S.view==='review') html=review();
@@ -605,6 +665,8 @@ app.addEventListener('click',e=>{
   if(act!=='drop') S.drop=false;
   switch(act){
     case 'nav': S.tab=id;S.view=null;break;
+    case 'glogin': signIn();return;
+    case 'logout': S.view='login';S.email='';render();toast(T().t_logout);return;
     case 'drop': S.drop=!S.drop;break;
     case 'bld': S.building=+id;break;
     case 'htab': S.homeTab=+id;break;
@@ -639,11 +701,13 @@ app.addEventListener('click',e=>{
 });
 app.addEventListener('input',e=>{
   if(e.target.id==='q'){S.query=e.target.value;const box=document.getElementById('homeList');if(box)box.innerHTML=homeList();}
+  if(e.target.id==='login-email'){S.email=e.target.value;if(S.emailErr){S.emailErr=false;const er=document.getElementById('login-err');if(er)er.remove();e.target.setAttribute('aria-invalid','false');}}
   if(S.draft){ if(e.target.id==='f-name')S.draft.name=e.target.value; if(e.target.id==='f-price')S.draft.price=e.target.value; }
 });
 app.addEventListener('change',e=>{ if(e.target.id==='f-cat'&&S.draft)S.draft.cat=e.target.value; });
 app.addEventListener('submit',e=>{
   e.preventDefault();
+  if(e.target.id==='loginForm'){const v=(S.email||'').trim();if(/^[^\s@]+@(g\.)?nccu\.edu\.tw$/i.test(v)){signIn();}else{S.emailErr=true;render();const el=document.getElementById('login-email');if(el)el.focus();}return;}
   const t=T();const d=S.draft;const price=Math.max(0,parseInt(d.price,10)||0);
   const name=d.name.trim()||t.untitled;
   const it={id:nextId++,name:{zh:name,en:name},price,cond:d.cond,b:1,cat:d.cat,hot:0,sale:0,seller:{zh:'小安',en:'An'},desc:{zh:L.zh.new_desc,en:L.en.new_desc}};
@@ -656,7 +720,9 @@ app.addEventListener('submit',e=>{
   let h=(location.hash||'').slice(1).toLowerCase();
   if(h.endsWith('-en')){S.lang='en';h=h.slice(0,-3);} else if(h.endsWith('-zh')){S.lang='zh';h=h.slice(0,-3);}
   const T2=L[S.lang];
+  if(!h||h==='login') S.view='login';
   switch(h){
+    case 'home': break;
     case 'drop': S.drop=true;break;
     case 'saved': S.tab='saved';break;
     case 'msg': S.tab='msg';break;
